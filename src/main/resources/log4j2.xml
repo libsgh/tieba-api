@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Appenders>
+		<!--这个输出控制台的配置 -->
+		<Console name="SYSOUT" target="SYSTEM_OUT">
+			<PatternLayout charset="UTF-8"
+				pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+	</Appenders>
+	<Loggers>
+		<Root level="DEBUG">
+			<!-- 生产环境可以注释此项 -->
+			<AppenderRef ref="SYSOUT" />
+		</Root>
+	</Loggers>
+</Configuration> 
