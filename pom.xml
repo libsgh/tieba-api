@@ -16,7 +16,7 @@
     </licenses>
     <scm>
     	<tag>master</tag>
-        <url>git@github.com:libsgh/tieba-api.git</url>
+        <url>https://github.com/libsgh/tieba-api.git</url>
         <connection>https://github.com/libsgh/tieba-api.git</connection>
     </scm>
 	<properties>
