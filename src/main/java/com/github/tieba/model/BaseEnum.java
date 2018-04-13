@@ -1,4 +1,4 @@
-package com.tieba.model;
+package com.github.tieba.model;
 
 public interface BaseEnum<T> {
 	

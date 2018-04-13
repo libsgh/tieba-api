@@ -9,8 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.alibaba.fastjson.JSONObject;
-import com.tieba.api.TieBaApi;
-import com.tieba.model.ReplyInfo;
+import com.github.tieba.api.TieBaApi;
+import com.github.tieba.model.ReplyInfo;
 
 public class BaiDuApiTest {
 	

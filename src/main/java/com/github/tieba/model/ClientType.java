@@ -1,4 +1,4 @@
-package com.tieba.model;
+package com.github.tieba.model;
 
 /**
  * 客户端类型（贴吧回帖）
