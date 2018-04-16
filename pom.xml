@@ -82,7 +82,7 @@
 	</developers>
   <profiles>
         <profile>
-            <id>release</id> <!-- 部署要用到 -->
+            <id>releases</id> <!-- 部署要用到 -->
             <build>
                 <plugins>
                     <!-- Source -->
@@ -132,11 +132,11 @@
             <distributionManagement>
                 <snapshotRepository>
                     <id>oss</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
                 </snapshotRepository>
                 <repository>
                     <id>oss</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
                 </repository>
             </distributionManagement>
         </profile>
