@@ -8,7 +8,7 @@
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Root level="DEBUG">
+		<Root level="INFO">
 			<!-- 生产环境可以注释此项 -->
 			<AppenderRef ref="SYSOUT" />
 		</Root>
