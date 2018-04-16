@@ -67,12 +67,12 @@ public class HttpKit {
 		return execute(url, cookie, params, null);
 	}
 	/**
-	 * @Description: 带header参数的请求
-	 * @param url
-	 * @param cookie
-	 * @param headerMaps
-	 * @return
+	 * @param url url
+	 * @param cookie cookie
+	 * @param headerMaps headerMaps
+	 * @return HttpResponse
 	 * @throws Exception
+	 * 带header参数的请求
 	 */
 	public HttpResponse execute(String url, String cookie, HashMap<String, Header> headerMaps) throws Exception{
 		return execute(url, cookie, null, headerMaps);
@@ -80,13 +80,13 @@ public class HttpKit {
 	
 	/**
 	 * 百度post/get请求
-	 * @param url
+	 * @param url url
 	 * @param cookie bduss、stoken
-	 * @param params
-	 * @param headers 添加额外header
-	 * @return
+	 * @param params params
+	 * @param headerMaps 添加额外header
+	 * @return HttpResponse
 	 * 20170117添加stoken
-	 * @throws Exception
+	 * @throws Exception 网络请求异常
 	 */
 	public HttpResponse execute(String url, String cookie, List<NameValuePair> params, HashMap<String, Header> headerMaps) throws Exception{
 		RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).build();
@@ -138,9 +138,9 @@ public class HttpKit {
 	
 	/**
 	 * 获取stoken
-	 * @param authUrl
-	 * @param cookie
-	 * @return
+	 * @param authUrl authUrl
+	 * @param cookie cookie
+	 * @return stoken
 	 */
     public String doGetStoken(String authUrl,String cookie) {
     	CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -185,7 +185,7 @@ public class HttpKit {
     }
 	/**
 	 * 获取cookies
-	 * @return
+	 * @return Cookies
 	 */
 	public String getCookies() {
         StringBuilder sb = new StringBuilder();
@@ -197,9 +197,9 @@ public class HttpKit {
     }
 	
 	/** 
-	 * @Description: 构建header头信息 
-	 * @param headerMaps
-	 * @return
+	 * 构建header头信息 
+	 * @param headerMaps headerMaps
+	 * @return Header[]
 	 */
     public Header[] build(HashMap<String, Header> headerMaps) {  
         Header[] headers = new Header[headerMaps.size()];  

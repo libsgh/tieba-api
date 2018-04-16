@@ -3,12 +3,16 @@ package com.github.tieba.api;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,7 +36,6 @@ import com.github.tieba.model.ClientType;
 import com.github.tieba.model.MyTB;
 import com.github.tieba.model.ReplyInfo;
 import com.github.tieba.util.Constants;
-import com.github.tieba.util.DateKit;
 import com.github.tieba.util.HttpKit;
 import com.github.tieba.util.JsonKit;
 import com.github.tieba.util.MD5Kit;
@@ -53,15 +56,13 @@ public class TieBaApi {
 	
 	/**
 	 * 百度登录（获取bduss、stoken）
-	 * @param userName
-	 * @param password
-	 * @param verifyCode
-	 * @param codeString
-	 * @param cookie
-	 * @param token
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 * @throws Exception
+	 * @param userName 用户名
+	 * @param password 密码
+	 * @param verifyCode 输入的验证码
+	 * @param codeString 验证码code（服务器返回的）
+	 * @param cookie cookie
+	 * @param token token
+	 * @return map 登录信息
 	 */
 	public Map<String, Object> getBaiDuLoginCookie(String userName, String password, String verifyCode,
 			String codeString, String cookie, String token){
@@ -192,8 +193,8 @@ public class TieBaApi {
 	
 	/**
 	 * 获取登陆token
-	 * @return
-	 * @throws Exception
+	 * @return token
+	 * @throws Exception 异常
 	 */
 	public String token() throws Exception{
 		String token = null;
@@ -209,9 +210,9 @@ public class TieBaApi {
 	
 	/**
 	 * 一键签到所有贴吧
-	 * @param bduss
-	 * @param stoken
-	 * @return
+	 * @param bduss bduss
+	 * @param stoken stoken
+	 * @return 签到结果
 	 */
 	public Map<String, Object> oneBtnToSign(String bduss, String stoken){
 		Long start = System.currentTimeMillis();
@@ -239,7 +240,8 @@ public class TieBaApi {
 	 * 执行签到
 	 * @param tbName 想要签到的贴吧
 	 * @param fid 贴吧fid
-	 * @param bduss
+	 * @param bduss bduss
+	 * @return 签到结果
 	 */
 	@SuppressWarnings({ "resource", "unchecked" })
 	public Map<String, Object> signOneTieBa(String tbName, int fid, String bduss){
@@ -276,7 +278,7 @@ public class TieBaApi {
 	            }
 	            tb.put("exp", signPoint);
 	            tb.put("countSignNum", map==null?0:Integer.parseInt(map.get("cont_sign_num")));
-	            tb.put("signTime", DateKit.realTime("Asia/Shanghai"));
+	            tb.put("signTime", realTime("Asia/Shanghai"));
 	            tb.put("error_msg", "签到成功");
 	            //tb.set("signTime", Integer.parseInt(map.get("sign_time"))*1000);
 	        }else if("160002".equals(code)){
@@ -298,7 +300,9 @@ public class TieBaApi {
 	
 	/**
 	 * 获取tbs
-	 * @throws Exception 
+	 * @param bduss bduss
+	 * @return tbs tbs
+	 * @throws Exception 异常
 	 */
 	public String getTbs(String bduss) throws Exception{
 		HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss));
@@ -309,7 +313,7 @@ public class TieBaApi {
 	 * 获取用户隐藏贴吧
 	 * @param username 用户名
 	 * @param curpn 页码
-	 * @return
+	 * @return result
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Map<String, Object>> getHideTbs(String username, Integer curpn) {
@@ -342,7 +346,7 @@ public class TieBaApi {
 	/**
 	 * 获取用户隐藏贴吧
 	 * @param username 用户名
-	 * @return
+	 * @return result
 	 */
 	public List<Map<String, Object>> getHideTbs(String username) {
 		return this.getHideTbs(username, null);
@@ -350,9 +354,13 @@ public class TieBaApi {
 	
 	/**
 	 * 递归获取关注贴吧数
-	 * @throws Exception 
-	 * @throws IOException 
-	 * @throws ParseException 
+	 * @param uid
+	 * @param tiebas
+	 * @param page
+	 * @param curpn
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	private void getTbsByUid(String uid, List<Map<String, Object>> tiebas, int page, Integer curpn) throws ParseException, IOException, Exception {
@@ -392,8 +400,9 @@ public class TieBaApi {
 	
 	/**
 	 * 获取我喜欢的贴吧（不带分页参数）
-	 * @param bduss
-	 * @param stoken
+	 * @param bduss bduss
+	 * @param stoken stoken
+	 * @return result
 	 */
 	public List<MyTB> getMyLikedTB(String bduss, String stoken){
 		List<MyTB> list = new ArrayList<MyTB>();
@@ -403,9 +412,9 @@ public class TieBaApi {
 	
 	/**
 	 * 获取用户信息（user_portrait）
-	 * @param bduss
-	 * @param stoken
-	 * @return
+	 * @param bduss bduss
+	 * @param stoken stoken
+	 * @return result
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getUserInfo(String bduss, String stoken){
@@ -423,11 +432,10 @@ public class TieBaApi {
 	
 	/**
 	 * 获取我喜欢的贴吧
-	 * @param bduss
-	 * @param stoken
-	 * @param list
-	 * @param fn
-	 * @return
+	 * @param bduss bduss
+	 * @param stoken stoken
+	 * @param list tbList
+	 * @param fn page
 	 */
 	public void getMyLikedTB(String bduss, String stoken, List<MyTB> list, String fn){
 		try {
@@ -471,8 +479,8 @@ public class TieBaApi {
 	
 	/**
 	 * 获取用户头像URL
-	 * @param username
-	 * @return
+	 * @param username 用户id
+	 * @return result
 	 */
 	public String getHeadImg(String username){
 		try {
@@ -488,9 +496,8 @@ public class TieBaApi {
 	}
 	/**
 	 * 文库签到
-	 * @param bduss
-	 * @return
-	 * @throws Exception
+	 * @param bduss bduss
+	 * @return result
 	 */
 	public String wenKuSign(String bduss){
 		try {
@@ -509,8 +516,8 @@ public class TieBaApi {
 	
 	/**
 	 * 知道签到
-	 * @param bduss
-	 * @return
+	 * @param bduss bduss
+	 * @return result
 	 */
 	public String zhiDaoSign(String bduss){
 		try {
@@ -544,7 +551,7 @@ public class TieBaApi {
 	
 	/**
 	 * 获取贴吧首页帖子tid列表
-	 * @param tbName
+	 * @param tbName 贴吧id
 	 * @param replyNum 定义标志 根据回复数筛选（回复为0的帖子，抢二楼专用）
 	 * @return 帖子tid 数组
 	 * 帖子链接：https://tieba.baidu.com/p/  + tid
@@ -589,7 +596,7 @@ public class TieBaApi {
 	
 	/**
 	 * 获取贴吧首页帖子tid列表
-	 * @param tbName
+	 * @param tbName 贴吧名称
 	 * @return 帖子tid 数组
 	 * 帖子链接：https://tieba.baidu.com/p/  + tid
 	 */
@@ -599,8 +606,8 @@ public class TieBaApi {
 	
 	/**
 	 * 获取贴吧fid
-	 * @param tbName
-	 * @return
+	 * @param tbName 贴吧id
+	 * @return fid fid
 	 */
 	@SuppressWarnings("unchecked")
 	public String getFid(String tbName){
@@ -621,10 +628,10 @@ public class TieBaApi {
 	
 	/**
 	 * 
-	 * @param bduss
-	 * @param tid ---> thread_id (getMsg可以获取)
-	 * @param pid ---> post_id (getMsg可以获取)
-	 * @return
+	 * @param bduss bduss
+	 * @param tid thread_id (getMsg可以获取)
+	 * @param pid post_id (getMsg可以获取)
+	 * @return floorpid
 	 */
 	@SuppressWarnings("unchecked")
 	public String floorpid(String bduss, String tid, String pid){
@@ -659,7 +666,7 @@ public class TieBaApi {
 	
 	/**
 	 * 回帖
-	 * @param bduss
+	 * @param bduss bduss
 	 * @param tid 帖子id
 	 * @param tbName 贴吧名称
 	 * @param content 回复内容
@@ -714,13 +721,13 @@ public class TieBaApi {
 	
 	/**
 	 * 楼中楼回复
-	 * @param bduss
+	 * @param bduss bduss
 	 * @param tid 帖子id
 	 * @param tbName 贴吧名称
 	 * @param content 回帖内容
 	 * @param clientType 模拟客户端类型0，为随机
 	 * @param pid 回复楼层id
-	 * @return
+	 * @return 回复结果
 	 */
 	public String replyFloor(String bduss, String tid, String tbName, String content, Integer clientType, String pid){
 		String msg = "";
@@ -771,10 +778,10 @@ public class TieBaApi {
 	
 	/**
 	 * 查询艾特/回复 信息
-	 * @param bduss
+	 * @param bduss bduss
 	 * @param type reply or at
-	 * @param type pn
-	 * @return
+	 * @param pn pageno
+	 * @return result
 	 */
 	public List<ReplyInfo> getMsg(String bduss, String type, int pn){
 		try {
@@ -802,8 +809,8 @@ public class TieBaApi {
 	}
 	/**
 	 * 判断登录状态
-	 * @param bduss
-	 * @return
+	 * @param bduss bduss
+	 * @return true or false
 	 */
 	public boolean islogin(String bduss){
 		try {
@@ -819,8 +826,10 @@ public class TieBaApi {
 	}
 	/**
 	 * 根据bduss和stoken生成cookie
-	 * @param bduss
-	 * @param stoken
+	 * @param bduss bduss
+	 * @param stoken stoken
+	 * @param ptoken ptoken
+	 * @return cookie
 	 */
 	public String createCookie(String bduss, String stoken, String ptoken){
 		StringBuilder sb = new StringBuilder();
@@ -844,17 +853,46 @@ public class TieBaApi {
 	}
 	/**
 	 * 根据bduss和stoken生成cookie
-	 * @param bduss
-	 * @param stoken
+	 * @param bduss bduss
+	 * @param stoken stoken
+	 * @return cookie
 	 */
 	public String createCookie(String bduss, String stoken){
 		return createCookie(bduss, stoken, null);
 	}
 	/**
 	 * 根据bduss生成cookie
-	 * @param bduss
+	 * @param bduss bduss
+	 * @return cookie
 	 */
 	public String createCookie(String bduss){
 		return createCookie(bduss, null, null);
 	}
+	
+	/**
+	 * 根据时区 获取当前时间（Asia/Shanghai）
+	 * @param _timeZone
+	 * @return 当前时间date
+	 */
+	private static Date realTime(String _timeZone){
+	     TimeZone timeZone = null;
+	     if(StrKit.isBlank(_timeZone)){
+	         timeZone = TimeZone.getDefault();
+	     }else{
+	         timeZone = TimeZone.getTimeZone(_timeZone);
+	     }
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日  HH时mm分ss秒");
+		sdf.setTimeZone(timeZone);
+		DateFormat df = new SimpleDateFormat("yyyy年MM月dd日  HH时mm分ss秒");
+		Date date = null;
+		try {
+			date = df.parse(df.format(new Date()));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+		return date;
+	}
+	
 }

@@ -13,7 +13,7 @@ public class StrKit {
      * @param str 原字符串
      * @param s1 起始字符串
      * @param s2 结束字符串
-     * @return
+     * @return String
      */
     public static String substring(String str, String s1, String s2) {
 		// 1、先获得0-s1的字符串，得到新的字符串sb1
@@ -28,8 +28,10 @@ public class StrKit {
 	}
     
     /**
-	 * 字符串为 null 或者内部字符全部为 ' ' '\t' '\n' '\r' 这四类字符时返回 true
-	 */
+     * 字符串为 null 或者内部字符全部为 ' ' '\t' '\n' '\r' 这四类字符时返回 true
+     * @param str 字符串
+     * @return boolean
+     */
 	public static boolean isBlank(String str) {
 		if (str == null) {
 			return true;
