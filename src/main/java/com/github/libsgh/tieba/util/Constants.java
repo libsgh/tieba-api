@@ -1,4 +1,4 @@
-package com.github.tieba.util;
+package com.github.libsgh.tieba.util;
 
 /**
  * 百度贴吧一些常用url常量

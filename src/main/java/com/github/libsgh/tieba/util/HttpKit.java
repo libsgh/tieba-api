@@ -1,4 +1,4 @@
-package com.github.tieba.util;
+package com.github.libsgh.tieba.util;
 
 import java.io.IOException;
 import java.util.HashMap;

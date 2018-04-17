@@ -1,4 +1,4 @@
-package com.github.tieba.model;
+package com.github.libsgh.tieba.model;
 
 import java.util.Date;
 

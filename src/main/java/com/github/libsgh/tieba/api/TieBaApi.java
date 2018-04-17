@@ -1,4 +1,4 @@
-package com.github.tieba.api;
+package com.github.libsgh.tieba.api;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,14 +32,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.alibaba.fastjson.JSON;
-import com.github.tieba.model.ClientType;
-import com.github.tieba.model.MyTB;
-import com.github.tieba.model.ReplyInfo;
-import com.github.tieba.util.Constants;
-import com.github.tieba.util.HttpKit;
-import com.github.tieba.util.JsonKit;
-import com.github.tieba.util.MD5Kit;
-import com.github.tieba.util.StrKit;
+import com.github.libsgh.tieba.model.ClientType;
+import com.github.libsgh.tieba.model.MyTB;
+import com.github.libsgh.tieba.model.ReplyInfo;
+import com.github.libsgh.tieba.util.Constants;
+import com.github.libsgh.tieba.util.HttpKit;
+import com.github.libsgh.tieba.util.JsonKit;
+import com.github.libsgh.tieba.util.MD5Kit;
+import com.github.libsgh.tieba.util.StrKit;
 
 /**
  * 贴吧api
