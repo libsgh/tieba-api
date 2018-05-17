@@ -32,7 +32,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void reply() {
-		logger.info(TieBaApi.api.reply(bduss, "5635882244", "bug", "#bug吧#回帖接口测试", 0).toString());
+		logger.info(TieBaApi.getInstance().reply(bduss, "5635882244", "bug", "#bug吧#回帖接口测试", 0).toString());
 	}
 	
 	/**
@@ -40,7 +40,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getIndexTList() {
-		logger.info(TieBaApi.api.getIndexTList("bug",1).toString());
+		logger.info(TieBaApi.getInstance().getIndexTList("bug",1).toString());
 		
 	}
 	
@@ -49,7 +49,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void oneBtnToSign() {
-		Map<String, Object> msg = TieBaApi.api.oneBtnToSign(bduss, stoken);
+		Map<String, Object> msg = TieBaApi.getInstance().oneBtnToSign(bduss, stoken);
 		String result = JSONObject.toJSONString(msg);
 		logger.info(result);
 		
@@ -60,7 +60,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void signDo() {
-		Map<String, Object> map = TieBaApi.api.signOneTieBa("姜敏京", 282280, bduss);
+		Map<String, Object> map = TieBaApi.getInstance().signOneTieBa("姜敏京", 282280, bduss);
 		String result = JSONObject.toJSONString(map);
 		logger.info(result);
 		
@@ -71,7 +71,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getHideTbs() {
-		List<Map<String, Object>> list = TieBaApi.api.getHideTbs(username);
+		List<Map<String, Object>> list = TieBaApi.getInstance().getHideTbs(username);
 		String result = JSONObject.toJSONString(list);
 		logger.info(result);
 		
@@ -82,7 +82,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getMyLikedTB() {
-		logger.info(JSONObject.toJSONString(TieBaApi.api.getMyLikedTB(bduss, stoken)));
+		logger.info(JSONObject.toJSONString(TieBaApi.getInstance().getMyLikedTB(bduss, stoken)));
 	}
 	
 	/**
@@ -90,7 +90,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getUserInfo() {
-		logger.info(JSONObject.toJSONString(TieBaApi.api.getUserInfo(bduss, stoken)));
+		logger.info(JSONObject.toJSONString(TieBaApi.getInstance().getUserInfo(bduss, stoken)));
 	}
 	
 	/**
@@ -98,7 +98,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getHeadImg() {
-		logger.info(TieBaApi.api.getHeadImg(username));
+		logger.info(TieBaApi.getInstance().getHeadImg(username));
 	}
 	
 	/**
@@ -106,7 +106,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void zhiDaoSign() {
-		logger.info(TieBaApi.api.zhiDaoSign(bduss));
+		logger.info(TieBaApi.getInstance().zhiDaoSign(bduss));
 	}
 	
 	/**
@@ -114,7 +114,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void wenKuSign() {
-		logger.info(TieBaApi.api.wenKuSign(bduss));
+		logger.info(TieBaApi.getInstance().wenKuSign(bduss));
 	}
 	
 	/**
@@ -122,8 +122,8 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getMsg() {
-		logger.info(JSONObject.toJSONString(TieBaApi.api.getMsg(bduss, "reply", 1)));
-		//logger.info(JSONObject.toJSONString(TieBaApi.api.getMsg(bduss, "at", 1)));
+		logger.info(JSONObject.toJSONString(TieBaApi.getInstance().getMsg(bduss, "reply", 1)));
+		//logger.info(JSONObject.toJSONString(TieBaApi.getInstance().getMsg(bduss, "at", 1)));
 	}
 	
 	/**
@@ -131,7 +131,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void replyFloor() {
-		logger.info(TieBaApi.api.replyFloor(bduss, "tid", "fname", "···", 0 , "pid").toString());
+		logger.info(TieBaApi.getInstance().replyFloor(bduss, "tid", "fname", "···", 0 , "pid").toString());
 	}
 	
 	/**
@@ -139,11 +139,20 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void floorpid() {
-		List<ReplyInfo> list = TieBaApi.api.getMsg(bduss, "reply", 1);
+		List<ReplyInfo> list = TieBaApi.getInstance().getMsg(bduss, "reply", 1);
 		for (ReplyInfo replyInfo : list) {
 			System.out.println(JSONObject.toJSONString(replyInfo));
-			logger.info(TieBaApi.api.floorpid(bduss, replyInfo.getThread_id(), replyInfo.getPost_id()));
+			logger.info(TieBaApi.getInstance().floorpid(bduss, replyInfo.getThread_id(), replyInfo.getPost_id()));
 		}
+	}
+	
+	/**
+	 * 获取用户信息
+	 */
+	@Test
+	public void getUserProfile() {
+		String result = TieBaApi.getInstance().getUserProfile("数学書");
+		logger.info(result);
 	}
 	
 	/**
@@ -157,7 +166,7 @@ public class BaiDuApiTest {
 		String codeString = "";//验证码code
 		String cookies = "";//登录的cookie
 		String token = "";//token
-		Map<String, Object> map= TieBaApi.api.getBaiDuLoginCookie(account, password, verifyCode, codeString, cookies, token);
+		Map<String, Object> map= TieBaApi.getInstance().getBaiDuLoginCookie(account, password, verifyCode, codeString, cookies, token);
 		String result = JSONObject.toJSONString(map);
 		logger.info(result);
 	}
