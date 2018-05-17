@@ -50,9 +50,20 @@ public class TieBaApi {
 	
 	private Logger logger = LogManager.getLogger(getClass());
 	
-	public static final TieBaApi api = new TieBaApi();
+	public  static volatile TieBaApi api;
 	
 	private HttpKit hk = HttpKit.getInstance();
+	
+	public static TieBaApi getInstance() {
+        if (api == null) {
+            synchronized (TieBaApi.class) {
+                if (api == null) {
+                	api = new TieBaApi();
+                }
+            }
+        }
+        return api;
+    }
 	
 	/**
 	 * 百度登录（获取bduss、stoken）
@@ -304,9 +315,14 @@ public class TieBaApi {
 	 * @return tbs tbs
 	 * @throws Exception 异常
 	 */
-	public String getTbs(String bduss) throws Exception{
-		HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss));
-		return (String) JsonKit.getInfo("tbs", EntityUtils.toString(response.getEntity()));
+	public String getTbs(String bduss){
+		try {
+			HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss));
+			return (String) JsonKit.getInfo("tbs", EntityUtils.toString(response.getEntity()));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
 	}
 	
 	/**
@@ -341,6 +357,166 @@ public class TieBaApi {
 			return tiebas;
 		}
 		return tiebas;
+	}
+	
+	/**
+	 * 用户个人信息查询
+	 * @param name 用户名
+	 * @return 返回结果
+	 */
+	public String getUserProfile(String name) {
+		String result = "";
+		try {
+			//1.根据名称获取uid
+			HttpResponse response0 = hk.execute(Constants.NEW_HEAD_URL + name, null);
+			String tieba_user = EntityUtils.toString(response0.getEntity());
+			String uid = StrKit.substring(tieba_user, "\"home_user_id\" : ", ",");
+			if(StrKit.isBlank(uid)){
+				return null;
+			}
+			//2.根据uid获取用户信息
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+		   list.add(new BasicNameValuePair("_client_version", "6.1.2"));//显示徽章必填项
+		   list.add(new BasicNameValuePair("has_plist", "2"));//1可以显示回帖信息
+		   list.add(new BasicNameValuePair("need_post_count", "1"));//查看回帖发帖数量必填
+		   list.add(new BasicNameValuePair("uid", uid));//用户的uid  必填
+		   String signStr = "";
+		   for (NameValuePair nameValuePair : list) {
+				   	signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+			}
+			signStr += "tiebaclient!!!";
+			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			HttpResponse response = hk.execute(Constants.USER_PROFILE, null, list);
+			result = EntityUtils.toString(response.getEntity());
+		} catch (ParseException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	    return result;
+	}
+	/**
+	 * 获取用户的礼物数量
+	 * @param name name
+	 * @return 返回结果
+	 */
+	public String getUserGiftNum(String name){
+		try {
+			//1.根据名称获取uid
+			HttpResponse response0 = hk.execute(Constants.NEW_HEAD_URL + name,null);
+			String tieba_user = EntityUtils.toString(response0.getEntity());
+			if(tieba_user.contains("gift-num")){
+				//有礼物
+				return StrKit.substring(tieba_user, "(<i>", "</i>)");
+			}else{
+				return "0";
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "0";
+	}
+	
+	/**
+	 * 关注一个人
+	 * @param portrait portrait
+	 * @param bduss bduss
+	 * @return 返回结果
+	 */
+	public String follow(String portrait, String bduss){
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("BDUSS",bduss));
+			list.add(new BasicNameValuePair("portrait", portrait));
+			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
+			list.add(new BasicNameValuePair("timestamp", String.valueOf(System.currentTimeMillis())));
+			String signStr = "";
+			for (NameValuePair nameValuePair : list) {
+				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+			}
+			signStr += "tiebaclient!!!";
+			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			HttpResponse response = hk.execute(Constants.FOLLOW, null, list);
+			String result = EntityUtils.toString(response.getEntity());
+			return result;
+		} catch (ParseException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
+	
+	
+	/**
+	 * 取消关注一个人
+	 * @param portrait portrait
+	 * @param bduss bduss
+	 * @return 返回结果
+	 */
+	public String unfollow(String portrait, String bduss){
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("BDUSS",bduss));
+			list.add(new BasicNameValuePair("portrait", portrait));
+			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
+			list.add(new BasicNameValuePair("timestamp", String.valueOf(System.currentTimeMillis())));
+			String signStr = "";
+			for (NameValuePair nameValuePair : list) {
+				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+			}
+			signStr += "tiebaclient!!!";
+			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			HttpResponse response = hk.execute(Constants.UNFOLLOW, null, list);
+			String result = EntityUtils.toString(response.getEntity());
+			return result;
+		} catch (ParseException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
+	
+	/**
+	 * 关注一个贴吧
+	 * @param BDUSS BDUSS
+	 * @param kw 贴吧名称
+	 * @param fid fid
+	 * @return 返回结果
+	 */
+	public Boolean focus(String BDUSS, String kw, String fid) {
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("BDUSS", BDUSS));
+			list.add(new BasicNameValuePair("fid", fid));
+			list.add(new BasicNameValuePair("kw", kw));
+			list.add(new BasicNameValuePair("tbs", getTbs(BDUSS)));
+			String signStr = "";
+			for (NameValuePair nameValuePair : list) {
+				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+			}
+			signStr += "tiebaclient!!!";
+			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			HttpResponse response = hk.execute(Constants.LIKE_TIEBA_URL, null, list);
+			String retCode = (String) JsonKit.getInfo("error_code", EntityUtils.toString(response.getEntity()));
+			if(retCode.equals("0")) {
+				return Boolean.TRUE;
+			}
+		} catch (ParseException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return Boolean.FALSE;
 	}
 	
 	/**
@@ -806,6 +982,82 @@ public class TieBaApi {
 			logger.error(e.getMessage(), e);
 		}
 		return null;
+	}
+	
+	/**
+	 * 获取帖子标题
+	 * @param tid tid
+	 * @return title
+	 */
+	@SuppressWarnings("unchecked")
+	public String getTTitle(String tid){
+		String title = "";
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("kz", tid));
+		String signStr = "";
+		for (NameValuePair nameValuePair : list) {
+			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+		}
+		signStr += "tiebaclient!!!";
+		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		try {
+			
+			HttpResponse response = hk.execute(Constants.F_PAGE, null, list);
+			String result = EntityUtils.toString(response.getEntity());
+			title = ((List<Map<String, Object>>) JsonKit.getInfo("post_list", result)).get(0).get("title").toString();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return title;
+	}
+	/**
+	 * 检验帖子id
+	 * @param arr 
+	 * @return 0 验证通过，-1 帖子所在的贴吧未关注，-2贴吧没有这个帖子 -3帖子不存在
+	 * @throws Exception
+	 */
+	/**
+	 *  检验帖子id
+	 * @param bduss bduss
+	 * @param url url
+	 * @param fid fid
+	 * @return 0 验证通过，-1 帖子所在的贴吧未关注，-2贴吧没有这个帖子 -3帖子不存在
+	 * @throws Exception
+	 */
+	public Integer checkT(String bduss, String url, String fid){
+		try {
+			String isLike = null;
+			String fid2 = null;
+			HttpResponse response = hk.execute(url,bduss);
+			String str = EntityUtils.toString(response.getEntity());
+			Pattern pattern = Pattern.compile("islike: '(.*?)'");
+			Matcher matcher = pattern.matcher(str);
+			if(str.contains("page404")){
+				return -3;
+			}
+			if(matcher.find()){
+				isLike = matcher.group(1);
+			}
+			Pattern fidPattern = Pattern.compile("fid: '(.*?)'");
+			Matcher fidMatcher = fidPattern.matcher(str);
+			if(fidMatcher.find()){
+				fid2 = fidMatcher.group(1);
+			}
+			if("1".equals(isLike)){
+				if(!fid2.equals(fid)){
+					return -2;
+				}
+			}else if("0".equals(isLike)){
+				return -1;
+			}
+		} catch (ParseException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return 0;
 	}
 	/**
 	 * 判断登录状态
