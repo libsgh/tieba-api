@@ -313,7 +313,6 @@ public class TieBaApi {
 	 * 获取tbs
 	 * @param bduss bduss
 	 * @return tbs tbs
-	 * @throws Exception 异常
 	 */
 	public String getTbs(String bduss){
 		try {
@@ -1022,7 +1021,6 @@ public class TieBaApi {
 	 * @param url url
 	 * @param fid fid
 	 * @return 0 验证通过，-1 帖子所在的贴吧未关注，-2贴吧没有这个帖子 -3帖子不存在
-	 * @throws Exception
 	 */
 	public Integer checkT(String bduss, String url, String fid){
 		try {
