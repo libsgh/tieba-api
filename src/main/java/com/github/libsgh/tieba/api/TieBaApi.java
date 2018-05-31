@@ -870,7 +870,6 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("net_type", "3"));
 			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
 			list.add(new BasicNameValuePair("tid", tid));
-			list.add(new BasicNameValuePair("quote_id", "118966657656"));
 			list.add(new BasicNameValuePair("title", ""));
 			String signStr = "";
 			for (NameValuePair nameValuePair : list) {
