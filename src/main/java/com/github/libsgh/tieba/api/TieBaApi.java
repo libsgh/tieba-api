@@ -519,6 +519,61 @@ public class TieBaApi {
 	}
 	
 	/**
+	 * 关注一个贴吧
+	 * @param BDUSS BDUSS
+	 * @param kw 贴吧名称
+	 * @return 返回结果
+	 */
+	public Boolean focus(String BDUSS, String kw) {
+		return focus(BDUSS, kw, getFid(kw));
+	}
+	
+	/**
+	 * 取消关注一个贴吧
+	 * @param BDUSS BDUSS
+	 * @param kw 贴吧名称
+	 * @param fid fid
+	 * @return 返回结果
+	 */
+	public Boolean unfocus(String BDUSS, String kw, String fid) {
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("BDUSS", BDUSS));
+			list.add(new BasicNameValuePair("fid", fid));
+			list.add(new BasicNameValuePair("kw", kw));
+			list.add(new BasicNameValuePair("tbs", getTbs(BDUSS)));
+			String signStr = "";
+			for (NameValuePair nameValuePair : list) {
+				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+			}
+			signStr += "tiebaclient!!!";
+			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			HttpResponse response = hk.execute(Constants.UNFAVO_TIEBA_URL, null, list);
+			String retCode = (String) JsonKit.getInfo("error_code", EntityUtils.toString(response.getEntity()));
+			if(retCode.equals("0")) {
+				return Boolean.TRUE;
+			}
+		} catch (ParseException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return Boolean.FALSE;
+	}
+	
+	/**
+	 * 取消关注一个贴吧
+	 * @param BDUSS BDUSS
+	 * @param kw 贴吧名称
+	 * @return 返回结果
+	 */
+	public Boolean unfocus(String BDUSS, String kw) {
+		return unfocus(BDUSS, kw, getFid(kw));
+	}
+	
+	/**
 	 * 获取用户隐藏贴吧
 	 * @param username 用户名
 	 * @return result
