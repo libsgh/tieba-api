@@ -22,9 +22,9 @@ public class BaiDuApiTest {
 	
     @BeforeClass
     public static void runOnceBeforeClass() {
-        bduss = "hBazd6aWZoMVNrWk9CNG1-eHh4VFpiMjJ6WkxlWlpzLUFQUjcxOTRZOFFzNU5aSVFBQUFBJCQAAAAAAAAAAAEAAACbyIg4jKTV0sv9lUHJ7dOwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAmbFkQJmxZMF";
-        stoken = "5039dcf2c61e4bdcf13a949e515c1006056d175cbe3d8394f91d20d49acbf145";
-        username = "尋找她旳身影";
+        bduss = "";
+        stoken = "";
+        username = "";
     }
     
 	/**
@@ -169,6 +169,22 @@ public class BaiDuApiTest {
 		Map<String, Object> map= TieBaApi.getInstance().getBaiDuLoginCookie(account, password, verifyCode, codeString, cookies, token);
 		String result = JSONObject.toJSONString(map);
 		logger.info(result);
+	}
+	
+	/**
+	 * 关注一个贴吧
+	 */
+	@Test
+	public void focus() {
+		TieBaApi.getInstance().focus(bduss, "bug");
+	}
+	
+	/**
+	 * 取消关注一个贴吧
+	 */
+	@Test
+	public void unfocus() {
+		TieBaApi.getInstance().unfocus(bduss, "bug");
 	}
 	
 }
