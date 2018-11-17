@@ -24,7 +24,7 @@ public class BaiDuApiTest {
     public static void runOnceBeforeClass() {
         bduss = "";
         stoken = "";
-        username = "";
+        username = "数学書";
     }
     
 	/**
@@ -185,6 +185,14 @@ public class BaiDuApiTest {
 	@Test
 	public void unfocus() {
 		TieBaApi.getInstance().unfocus(bduss, "bug");
+	}
+	
+	/**
+	 * 获取登录二维码
+	 */
+	@Test
+	public void getQRCodeUrl() {
+		System.out.println(TieBaApi.getInstance().getQRCodeUrl());
 	}
 	
 }

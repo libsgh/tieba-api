@@ -44,4 +44,6 @@ public class Constants {
 	public static final String UNFAVO_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/unfavo";//取消关注一个贴吧
 	public static final String TIEBA_FID = "http://tieba.baidu.com/f/commit/share/fnameShareApi?ie=utf-8&fname=";//获取贴吧fid
 	public static final String FLOR_PID = "http://c.tieba.baidu.com/c/f/pb/floor";//获取楼层pid
+	public static final String GET_QRCODE_SIGN = "https://passport.baidu.com/v2/api/getqrcode";//获取登录二维码sign
+	public static final String GET_QRCODE_IMG = "https://passport.baidu.com/v2/api/qrcode?sign=%s&uaonly=&client_id=&lp=pc&client=&traceid=";//获取登录二维码图片
 }

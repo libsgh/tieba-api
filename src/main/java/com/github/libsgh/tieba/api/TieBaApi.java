@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -336,7 +337,7 @@ public class TieBaApi {
 		List<Map<String, Object>> tiebas = new ArrayList<Map<String, Object>>();
 		try {
 			list.add(new BasicNameValuePair("search_key", username));
-			list.add(new BasicNameValuePair("_client_version", "7.0.0.0"));
+			list.add(new BasicNameValuePair("_client_version", "6.2.2"));
 			String signStr = "";
 			for (NameValuePair nameValuePair : list) {
 				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
@@ -596,11 +597,11 @@ public class TieBaApi {
 	private void getTbsByUid(String uid, List<Map<String, Object>> tiebas, int page, Integer curpn) throws ParseException, IOException, Exception {
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list = new ArrayList<NameValuePair>();
-		list.add(new BasicNameValuePair("_client_version", "7.0.0.0"));
-		list.add(new BasicNameValuePair("friend_uid", uid));
-		list.add(new BasicNameValuePair("is_guest", "1"));
+		list.add(new BasicNameValuePair("_client_version", "6.2.2"));
+		//list.add(new BasicNameValuePair("friend_uid", uid));
+		list.add(new BasicNameValuePair("is_guest", "0"));
 		list.add(new BasicNameValuePair("page_no", (curpn == null?page:curpn) + ""));
-		list.add(new BasicNameValuePair("uid", "666"));
+		list.add(new BasicNameValuePair("uid", uid));
 		String signStr = "";
 		for (NameValuePair nameValuePair : list) {
 			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
@@ -736,7 +737,6 @@ public class TieBaApi {
 			headers.put("Referer", new BasicHeader("Referer", "https://wenku.baidu.com/task/browse/daily"));
 			HttpResponse response = hk.execute(Constants.WENKU_SIGN_URL, createCookie(bduss), headers);
 			String result = EntityUtils.toString(response.getEntity());
-			System.out.println(result);
 			return result;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -1127,6 +1127,27 @@ public class TieBaApi {
 			return false;
 		}
 		return false;
+	}
+	
+	/**
+	 * 获取登录二维码图片url
+	 * @return 二维码图片url
+	 */
+	@SuppressWarnings("resource")
+	public String getQRCodeUrl(){
+		String getParam = "?lp=pc&gid="+UUID.randomUUID().toString()+"&callback=tangram_guid_"+System.currentTimeMillis()+"&apiver=v3&tt="+System.currentTimeMillis()+"&tpl=mn";
+		try {
+			
+			HttpResponse response = hk.execute(Constants.GET_QRCODE_SIGN+getParam);
+			String result = EntityUtils.toString(response.getEntity());
+			String sign = JsonKit.getPInfo("sign", result).toString();
+			if(sign != null) {
+				return new Formatter().format(Constants.GET_QRCODE_IMG,sign).toString();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
 	}
 	/**
 	 * 根据bduss和stoken生成cookie

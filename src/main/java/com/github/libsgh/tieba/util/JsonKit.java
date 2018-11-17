@@ -16,4 +16,12 @@ public class JsonKit {
 		return ((Map<String, Object>) JSON.parse(jsonString)).get(fieldName);  
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static Object getPInfo(String fieldName, String jsonPString){  
+        int startIndex = jsonPString.indexOf("(");  
+        int endIndex = jsonPString.lastIndexOf(")");  
+        String json = jsonPString.substring(startIndex+1, endIndex);  
+        return ((Map<String, Object>) JSON.parse(json)).get(fieldName);  
+	}
+	
 }
