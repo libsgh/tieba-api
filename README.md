@@ -6,7 +6,7 @@ maven项目在pom.xml中引用，非maven项目在[tieba-api](http://mvnreposito
 <dependency>
     <groupId>com.github.libsgh</groupId>
     <artifactId>tieba-api</artifactId>
-    <version>0.0.4</version>
+    <version>${lastVersion}</version>
 </dependency>
 ```
 
