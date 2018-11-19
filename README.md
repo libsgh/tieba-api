@@ -1,4 +1,9 @@
 # tieba-api
+[![language](https://img.shields.io/badge/language-java-blue.svg)](https://www.java.com)
+[![](https://img.shields.io/badge/maven-v0.0.5-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/0.0.5)
+[![GitHub license](https://img.shields.io/github/license/libsgh/tieba-api.svg)](https://github.com/libsgh/tieba-api/blob/master/LICENSE)
+
+
 封装了百度贴吧的基本操作，登录，签到，回帖等
 ## 使用说明
 maven项目在pom.xml中引用，非maven项目在[tieba-api](http://mvnrepository.com/artifact/com.github.libsgh/tieba-api/)下载最新版
