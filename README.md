@@ -1,6 +1,6 @@
 # tieba-api
 [![language](https://img.shields.io/badge/language-java-blue.svg)](https://www.java.com)
-[![](https://img.shields.io/badge/maven-v0.0.5-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/0.0.5)
+[![version](https://img.shields.io/badge/version-v0.0.5-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/0.0.5)
 [![GitHub license](https://img.shields.io/github/license/libsgh/tieba-api.svg)](https://github.com/libsgh/tieba-api/blob/master/LICENSE)
 
 
