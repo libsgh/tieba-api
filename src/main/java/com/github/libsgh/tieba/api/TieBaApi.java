@@ -1262,7 +1262,7 @@ public class TieBaApi {
 	 * 分页获取关注列表
 	 * @param bduss bduss
 	 * @param pn 页码
-	 * @return
+	 * @return 关注列表
 	 */
 	public String getFollowPage(String bduss, Integer pn){
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
@@ -1326,7 +1326,7 @@ public class TieBaApi {
 	/**
 	 * 获取全部关注
 	 * @param bduss bduss
-	 * @return
+	 * @return 全部关注
 	 */
 	public List<Map<String, Object>> getFollowList(String bduss){
 		List<Map<String, Object>> fList = new ArrayList<Map<String, Object>>();
@@ -1337,7 +1337,7 @@ public class TieBaApi {
 	 * 分页获取粉丝
 	 * @param bduss bduss
 	 * @param pn 页码
-	 * @return
+	 * @return 粉丝列表
 	 */
 	public String getFansPage(String bduss, Integer pn){
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
@@ -1401,7 +1401,7 @@ public class TieBaApi {
 	/**
 	 * 获取全部粉丝
 	 * @param bduss bduss
-	 * @return
+	 * @return 全部粉丝
 	 */
 	public List<Map<String, Object>> getFansList(String bduss){
 		List<Map<String, Object>> fList = new ArrayList<Map<String, Object>>();
@@ -1413,6 +1413,7 @@ public class TieBaApi {
 	 * 移除粉丝
 	 * @param bduss bduss
 	 * @param fans_uid 用户id
+	 * @return 结果
 	 */
 	public String removeFans(String bduss, String fans_uid){
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
