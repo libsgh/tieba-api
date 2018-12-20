@@ -33,6 +33,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONPath;
 import com.github.libsgh.tieba.model.ClientType;
 import com.github.libsgh.tieba.model.MyTB;
 import com.github.libsgh.tieba.model.ReplyInfo;
@@ -1064,12 +1065,6 @@ public class TieBaApi {
 		return title;
 	}
 	/**
-	 * 检验帖子id
-	 * @param arr 
-	 * @return 0 验证通过，-1 帖子所在的贴吧未关注，-2贴吧没有这个帖子 -3帖子不存在
-	 * @throws Exception
-	 */
-	/**
 	 *  检验帖子id
 	 * @param bduss bduss
 	 * @param url url
@@ -1133,22 +1128,65 @@ public class TieBaApi {
 	 * 获取登录二维码图片url
 	 * @return 二维码图片url
 	 */
-	@SuppressWarnings("resource")
-	public String getQRCodeUrl(){
-		String getParam = "?lp=pc&gid="+UUID.randomUUID().toString()+"&callback=tangram_guid_"+System.currentTimeMillis()+"&apiver=v3&tt="+System.currentTimeMillis()+"&tpl=mn";
+	public Map<String, Object> getQRCodeUrl(){
+		Map<String, Object> map = new HashMap<String, Object>();
+		String gid = UUID.randomUUID().toString();
+		Long time = System.currentTimeMillis();
+		String getParam = "?lp=pc&gid="+gid+"&callback=tangram_guid_"+time+"&apiver=v3&tt="+System.currentTimeMillis()+"&tpl=mn";
 		try {
 			
 			HttpResponse response = hk.execute(Constants.GET_QRCODE_SIGN+getParam);
 			String result = EntityUtils.toString(response.getEntity());
 			String sign = JsonKit.getPInfo("sign", result).toString();
 			if(sign != null) {
-				return new Formatter().format(Constants.GET_QRCODE_IMG,sign).toString();
+				 map.put("codeUrl", new Formatter().format(Constants.GET_QRCODE_IMG,sign).toString());
+				 map.put("gid", gid);
+				 map.put("sign", sign);
+				 map.put("time", time+"");
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		return "";
+		return map;
 	}
+	
+	public Map<String, Object> getCookieFromQRCode(String v){
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			HttpResponse response = hk.execute("https://passport.baidu.com/v3/login/main/qrbdusslogin"
+					+ "?v="+System.currentTimeMillis()
+					+ "&bduss="+v
+					+ "&u=https%253A%252F%252Ftieba.baidu.com%252Findex.html"
+					+ "&loginVersion=v4"
+					+ "&qrcode=1"
+					+ "&tpl=tb"
+					+ "&apiver=v3"
+					+ "&tt="+System.currentTimeMillis()
+					+ "&traceid="
+					+ "&callback=bd__cbs__9txc5");
+			String bduss = "";
+			String ptoken = "";
+			String stoken = "";
+			for (Header header : response.getHeaders("Set-Cookie")) {
+				String cookieHeader = header.getValue();
+				if(cookieHeader.contains("BDUSS=")){
+					bduss = StrKit.substring(cookieHeader, "BDUSS=", ";");
+					map.put("bduss", bduss);
+				}else if(cookieHeader.contains("PTOKEN=")){
+					ptoken = StrKit.substring(cookieHeader, "PTOKEN=", ";");
+				}
+			}
+			stoken = hk.doGetStoken(Constants.PASSPORT_AUTH_URL,createCookie(bduss, null, ptoken));
+			logger.debug("bduss:\t"+bduss);
+			logger.debug("ptoken:\t"+ptoken);
+			logger.debug("stoken:\t"+stoken);
+			map.put("stoken", stoken);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return map;
+	}
+	
 	/**
 	 * 根据bduss和stoken生成cookie
 	 * @param bduss bduss
@@ -1220,4 +1258,183 @@ public class TieBaApi {
 		return date;
 	}
 	
+	/**
+	 * 分页获取关注列表
+	 * @param bduss bduss
+	 * @param pn 页码
+	 * @return
+	 */
+	public String getFollowPage(String bduss, Integer pn){
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("BDUSS", bduss));
+		list.add(new BasicNameValuePair("_client_id", "wappc_1542694366490_105"));
+		list.add(new BasicNameValuePair("_client_type", "2"));
+		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
+		list.add(new BasicNameValuePair("pn", pn + ""));
+		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
+		String signStr = "";
+		for (NameValuePair nameValuePair : list) {
+			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+		}
+		signStr += "tiebaclient!!!";
+		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		try {
+			HttpResponse response = hk.execute(Constants.GET_FOLLOW_LIST, null, list);
+			return EntityUtils.toString(response.getEntity());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
+	
+	/**
+	 * 获取关注列表
+	 * @param bduss bduss
+	 * @param pn 页码
+	 * @param fList 关注合集
+	 */
+	@SuppressWarnings("unchecked")
+	private void getFollowList(String bduss, Integer pn, List<Map<String,Object>> fList){
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("BDUSS", bduss));
+		list.add(new BasicNameValuePair("_client_id", "wappc_1542694366490_105"));
+		list.add(new BasicNameValuePair("_client_type", "2"));
+		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
+		list.add(new BasicNameValuePair("pn", pn + ""));
+		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
+		String signStr = "";
+		for (NameValuePair nameValuePair : list) {
+			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+		}
+		signStr += "tiebaclient!!!";
+		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		try {
+			HttpResponse response = hk.execute(Constants.GET_FOLLOW_LIST, null, list);
+			String result = EntityUtils.toString(response.getEntity());
+			fList.addAll((List<Map<String, Object>>) JSONPath.eval(JSON.parse(result), "follow_list"));
+			String hasMore = JsonKit.getInfo("has_more", result).toString();
+			if(hasMore.equals("1")) {
+				//还有下一页
+				pn++;
+				this.getFollowList(bduss, pn, fList);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * 获取全部关注
+	 * @param bduss bduss
+	 * @return
+	 */
+	public List<Map<String, Object>> getFollowList(String bduss){
+		List<Map<String, Object>> fList = new ArrayList<Map<String, Object>>();
+		this.getFollowList(bduss, 1, fList);
+		return fList;
+	}
+	/**
+	 * 分页获取粉丝
+	 * @param bduss bduss
+	 * @param pn 页码
+	 * @return
+	 */
+	public String getFansPage(String bduss, Integer pn){
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("BDUSS", bduss));
+		list.add(new BasicNameValuePair("_client_id", "wappc_1542694366490_105"));
+		list.add(new BasicNameValuePair("_client_type", "2"));
+		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
+		list.add(new BasicNameValuePair("pn", pn + ""));
+		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
+		String signStr = "";
+		for (NameValuePair nameValuePair : list) {
+			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+		}
+		signStr += "tiebaclient!!!";
+		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		try {
+			HttpResponse response = hk.execute(Constants.GET_FANS_LIST, null, list);
+			return EntityUtils.toString(response.getEntity());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
+	
+	/**
+	 * 获取粉丝列表
+	 * @param bduss bduss
+	 * @param pn 页码
+	 * @param fList 粉丝集合
+	 */
+	@SuppressWarnings("unchecked")
+	private void getFansList(String bduss, Integer pn, List<Map<String,Object>> fList){
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("BDUSS", bduss));
+		list.add(new BasicNameValuePair("_client_id", "wappc_1542694366490_105"));
+		list.add(new BasicNameValuePair("_client_type", "2"));
+		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
+		list.add(new BasicNameValuePair("pn", pn + ""));
+		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
+		String signStr = "";
+		for (NameValuePair nameValuePair : list) {
+			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+		}
+		signStr += "tiebaclient!!!";
+		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		try {
+			HttpResponse response = hk.execute(Constants.GET_FANS_LIST, null, list);
+			String result = EntityUtils.toString(response.getEntity());
+			fList.addAll((List<Map<String, Object>>) JSONPath.eval(JSON.parse(result), "user_list"));
+			String hasMore = (String) JSONPath.eval(JSON.parse(result), "$.page.has_more");
+			if(hasMore.equals("1")) {
+				//还有下一页
+				pn++;
+				this.getFansList(bduss, pn, fList);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * 获取全部粉丝
+	 * @param bduss bduss
+	 * @return
+	 */
+	public List<Map<String, Object>> getFansList(String bduss){
+		List<Map<String, Object>> fList = new ArrayList<Map<String, Object>>();
+		this.getFansList(bduss, 1, fList);
+		return fList;
+	}
+	
+	/**
+	 * 移除粉丝
+	 * @param bduss bduss
+	 * @param fans_uid 用户id
+	 */
+	public String removeFans(String bduss, String fans_uid){
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("BDUSS", bduss));
+		list.add(new BasicNameValuePair("_client_id", "wappc_1542694366490_105"));
+		list.add(new BasicNameValuePair("_client_type", "2"));
+		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
+		list.add(new BasicNameValuePair("fans_uid", fans_uid));
+		list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
+		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
+		String signStr = "";
+		for (NameValuePair nameValuePair : list) {
+			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+		}
+		signStr += "tiebaclient!!!";
+		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		try {
+			HttpResponse response = hk.execute(Constants.REMOVE_FANS, null, list);
+			return EntityUtils.toString(response.getEntity());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
 }
