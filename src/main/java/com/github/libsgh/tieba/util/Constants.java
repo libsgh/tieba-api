@@ -46,4 +46,7 @@ public class Constants {
 	public static final String FLOR_PID = "http://c.tieba.baidu.com/c/f/pb/floor";//获取楼层pid
 	public static final String GET_QRCODE_SIGN = "https://passport.baidu.com/v2/api/getqrcode";//获取登录二维码sign
 	public static final String GET_QRCODE_IMG = "https://passport.baidu.com/v2/api/qrcode?sign=%s&uaonly=&client_id=&lp=pc&client=&traceid=";//获取登录二维码图片
+	public static final String GET_FOLLOW_LIST = "http://c.tieba.baidu.com/c/u/follow/followList";//获取关注列表
+	public static final String GET_FANS_LIST = "http://c.tieba.baidu.com/c/u/fans/page";//获取粉丝列表
+	public static final String REMOVE_FANS = "http://c.tieba.baidu.com/c/c/user/removeFans";//移除粉丝
 }
