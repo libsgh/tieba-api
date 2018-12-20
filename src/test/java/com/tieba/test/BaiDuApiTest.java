@@ -19,12 +19,13 @@ public class BaiDuApiTest {
 	private static String bduss = "";
 	private static String stoken = "";
 	private static String username = "";
-	
+	private static TieBaApi api = null;
     @BeforeClass
     public static void runOnceBeforeClass() {
         bduss = "";
         stoken = "";
         username = "数学書";
+        api = TieBaApi.getInstance();
     }
     
 	/**
@@ -32,7 +33,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void reply() {
-		logger.info(TieBaApi.getInstance().reply(bduss, "5635882244", "bug", "#bug吧#回帖接口测试", 0).toString());
+		logger.info(api.reply(bduss, "5635882244", "bug", "#bug吧#回帖接口测试", 0).toString());
 	}
 	
 	/**
@@ -40,7 +41,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getIndexTList() {
-		logger.info(TieBaApi.getInstance().getIndexTList("bug",1).toString());
+		logger.info(api.getIndexTList("bug",1).toString());
 		
 	}
 	
@@ -49,7 +50,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void oneBtnToSign() {
-		Map<String, Object> msg = TieBaApi.getInstance().oneBtnToSign(bduss, stoken);
+		Map<String, Object> msg = api.oneBtnToSign(bduss, stoken);
 		String result = JSONObject.toJSONString(msg);
 		logger.info(result);
 		
@@ -60,7 +61,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void signDo() {
-		Map<String, Object> map = TieBaApi.getInstance().signOneTieBa("姜敏京", 282280, bduss);
+		Map<String, Object> map = api.signOneTieBa("姜敏京", 282280, bduss);
 		String result = JSONObject.toJSONString(map);
 		logger.info(result);
 		
@@ -71,7 +72,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getHideTbs() {
-		List<Map<String, Object>> list = TieBaApi.getInstance().getHideTbs(username);
+		List<Map<String, Object>> list = api.getHideTbs(username);
 		String result = JSONObject.toJSONString(list);
 		logger.info(result);
 		
@@ -82,7 +83,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getMyLikedTB() {
-		logger.info(JSONObject.toJSONString(TieBaApi.getInstance().getMyLikedTB(bduss, stoken)));
+		logger.info(JSONObject.toJSONString(api.getMyLikedTB(bduss, stoken)));
 	}
 	
 	/**
@@ -90,15 +91,15 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getUserInfo() {
-		logger.info(JSONObject.toJSONString(TieBaApi.getInstance().getUserInfo(bduss, stoken)));
+		logger.info(JSONObject.toJSONString(api.getUserInfo(bduss, stoken)));
 	}
 	
 	/**
-	 * 获取用户信息
+	 * 获取用户头像
 	 */
 	@Test
 	public void getHeadImg() {
-		logger.info(TieBaApi.getInstance().getHeadImg(username));
+		logger.info(api.getHeadImg(username));
 	}
 	
 	/**
@@ -106,7 +107,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void zhiDaoSign() {
-		logger.info(TieBaApi.getInstance().zhiDaoSign(bduss));
+		logger.info(api.zhiDaoSign(bduss));
 	}
 	
 	/**
@@ -114,7 +115,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void wenKuSign() {
-		logger.info(TieBaApi.getInstance().wenKuSign(bduss));
+		logger.info(api.wenKuSign(bduss));
 	}
 	
 	/**
@@ -122,8 +123,8 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getMsg() {
-		logger.info(JSONObject.toJSONString(TieBaApi.getInstance().getMsg(bduss, "reply", 1)));
-		//logger.info(JSONObject.toJSONString(TieBaApi.getInstance().getMsg(bduss, "at", 1)));
+		logger.info(JSONObject.toJSONString(api.getMsg(bduss, "reply", 1)));
+		//logger.info(JSONObject.toJSONString(api.getMsg(bduss, "at", 1)));
 	}
 	
 	/**
@@ -131,7 +132,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void replyFloor() {
-		logger.info(TieBaApi.getInstance().replyFloor(bduss, "tid", "fname", "···", 0 , "pid").toString());
+		logger.info(api.replyFloor(bduss, "tid", "fname", "···", 0 , "pid").toString());
 	}
 	
 	/**
@@ -139,10 +140,10 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void floorpid() {
-		List<ReplyInfo> list = TieBaApi.getInstance().getMsg(bduss, "reply", 1);
+		List<ReplyInfo> list = api.getMsg(bduss, "reply", 1);
 		for (ReplyInfo replyInfo : list) {
 			System.out.println(JSONObject.toJSONString(replyInfo));
-			logger.info(TieBaApi.getInstance().floorpid(bduss, replyInfo.getThread_id(), replyInfo.getPost_id()));
+			logger.info(api.floorpid(bduss, replyInfo.getThread_id(), replyInfo.getPost_id()));
 		}
 	}
 	
@@ -151,7 +152,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getUserProfile() {
-		String result = TieBaApi.getInstance().getUserProfile("数学書");
+		String result = api.getUserProfile("数学書");
 		logger.info(result);
 	}
 	
@@ -166,7 +167,7 @@ public class BaiDuApiTest {
 		String codeString = "";//验证码code
 		String cookies = "";//登录的cookie
 		String token = "";//token
-		Map<String, Object> map= TieBaApi.getInstance().getBaiDuLoginCookie(account, password, verifyCode, codeString, cookies, token);
+		Map<String, Object> map= api.getBaiDuLoginCookie(account, password, verifyCode, codeString, cookies, token);
 		String result = JSONObject.toJSONString(map);
 		logger.info(result);
 	}
@@ -176,7 +177,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void focus() {
-		TieBaApi.getInstance().focus(bduss, "bug");
+		api.focus(bduss, "bug");
 	}
 	
 	/**
@@ -184,7 +185,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void unfocus() {
-		TieBaApi.getInstance().unfocus(bduss, "bug");
+		api.unfocus(bduss, "bug");
 	}
 	
 	/**
@@ -192,7 +193,44 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getQRCodeUrl() {
-		System.out.println(TieBaApi.getInstance().getQRCodeUrl());
+		System.out.println(api.getQRCodeUrl());
 	}
 	
+	/**
+	 * 获取贴吧关注列表
+	 */
+	@Test
+	public void getFollowPage() {
+		System.out.println(api.getFollowPage(bduss, 4).toString());
+	}
+	
+	/**
+	 * 获取贴吧关注列表
+	 */
+	@Test
+	public void getFollowList() {
+		System.out.println(api.getFollowList(bduss).toString());
+	}
+	
+	/**
+	 * 获取贴吧粉丝列表
+	 */
+	@Test
+	public void getFansPage() {
+		System.out.println(api.getFansList(bduss).toString());
+	}
+	
+	/**
+	 * 移除粉丝
+	 */
+	@Test
+	public void removeFans() {
+		System.out.println(api.removeFans("B6cEs4TkxsOEsxZUFYeVpKWjk2a0p6M21BUmJwNmdCbGhXWDFGOFFtcjhJelJiQUFBQUFBJCQAAAAAAAAAAAEAAACaEH8JwZWRVF~Ex7PBxKwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPyWDFv8lgxbR1","756691293").toString());
+	}
+	
+	@Test
+	public void test1() {
+		System.out.println(api.islogin(bduss));
+		//System.out.println(api.getCookieFromQRCode("515e4535f9f632e59c468a0d752fffb7"));
+	}
 }
