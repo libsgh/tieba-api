@@ -1150,6 +1150,20 @@ public class TieBaApi {
 		return map;
 	}
 	
+	/**
+	 * 扫描二维码登录获取cookie
+	 * 参数v需要通过jsonp回调中获取
+	 * $.ajax({
+	 * 		url: "https://passport.baidu.com/channel/unicast?channel_id=${codeMap.sign}&tpl=mn&gid=${codeMap.gid}&apiver=v3&tt="+new Date().getTime(),	 
+	 *		type: "get",
+	 *		cache: false,
+	 *		dataType: "jsonp",
+	 *		jsonp: "callback",
+	 *		jsonpCallback: "tangram_guid"
+	 *	});
+	 * @param v
+	 * @return bduss,stoken
+	 */
 	public Map<String, Object> getCookieFromQRCode(String v){
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
