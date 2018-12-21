@@ -29,7 +29,7 @@ public class BaiDuApiTest {
     }
     
 	/**
-	 * 获取首页帖子tid数组
+	 * 回帖
 	 */
 	@Test
 	public void reply() {
@@ -197,7 +197,7 @@ public class BaiDuApiTest {
 	}
 	
 	/**
-	 * 获取贴吧关注列表
+	 * 获取关注的用户列表
 	 */
 	@Test
 	public void getFollowPage() {
@@ -205,7 +205,7 @@ public class BaiDuApiTest {
 	}
 	
 	/**
-	 * 获取贴吧关注列表
+	 * 获取关注的用户列表
 	 */
 	@Test
 	public void getFollowList() {
@@ -225,12 +225,23 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void removeFans() {
-		System.out.println(api.removeFans("B6cEs4TkxsOEsxZUFYeVpKWjk2a0p6M21BUmJwNmdCbGhXWDFGOFFtcjhJelJiQUFBQUFBJCQAAAAAAAAAAAEAAACaEH8JwZWRVF~Ex7PBxKwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPyWDFv8lgxbR1","756691293").toString());
+		System.out.println(api.removeFans(bduss,"fans_uid").toString());
 	}
 	
+	/**
+	 * 检查登录有效性
+	 */
 	@Test
-	public void test1() {
+	public void isLogin() {
 		System.out.println(api.islogin(bduss));
-		//System.out.println(api.getCookieFromQRCode("515e4535f9f632e59c468a0d752fffb7"));
 	}
+	
+	/**
+	 * 二维码登录获取cookie(bduss,stoken)
+	 */
+	@Test
+	public void getCookieFromQRCode() {
+		System.out.println(api.getCookieFromQRCode("v"));
+	}
+	
 }
