@@ -319,7 +319,9 @@ public class TieBaApi {
 	public String getTbs(String bduss){
 		try {
 			HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss));
-			return (String) JsonKit.getInfo("tbs", EntityUtils.toString(response.getEntity()));
+			String result = EntityUtils.toString(response.getEntity());
+			System.out.println(result);
+			return (String) JsonKit.getInfo("tbs", result);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -1107,21 +1109,19 @@ public class TieBaApi {
 		return 0;
 	}
 	/**
-	 * 判断登录状态
+	 * bduss有效性检测(是否是登录状态)
 	 * @param bduss bduss
 	 * @return true or false
 	 */
 	public boolean islogin(String bduss){
 		try {
-			String tbs = getTbs(bduss);
-			if(!StrKit.isBlank(tbs)) {
-				return true;
-			}
+			HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss));
+			String result = EntityUtils.toString(response.getEntity());
+			return (Integer) JsonKit.getInfo("is_login", result)==1?true:false;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
-		return false;
 	}
 	
 	/**
