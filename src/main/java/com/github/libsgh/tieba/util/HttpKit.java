@@ -162,7 +162,6 @@ public class HttpKit {
     				 Header h = response.getFirstHeader("Location");
     		            if(h != null){
     		                HttpGet reHttpGet = new HttpGet(h.getValue());
-    		                System.out.println(h.getValue());
     		                reHttpGet.setHeader("Cookie", cookie);
     		                reHttpGet.setConfig(config);
     		        		response = httpClient.execute(reHttpGet);
