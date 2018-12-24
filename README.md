@@ -1,6 +1,6 @@
 # tieba-api
 [![language](https://img.shields.io/badge/language-java-blue.svg)](https://www.java.com)
-[![version](https://img.shields.io/badge/version-v0.0.6-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/0.0.6)
+[![version](https://img.shields.io/badge/version-v0.0.7-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/0.0.7)
 [![GitHub license](https://img.shields.io/github/license/libsgh/tieba-api.svg)](https://github.com/libsgh/tieba-api/blob/master/LICENSE)
 
 
@@ -16,11 +16,11 @@ maven
 ```
 Gradle
 ```
-implementation 'com.github.libsgh:tieba-api:0.0.6'
+implementation 'com.github.libsgh:tieba-api:0.0.7'
 ```
 SBT
 ```
-libraryDependencies += "com.github.libsgh" % "tieba-api" % "0.0.6"
+libraryDependencies += "com.github.libsgh" % "tieba-api" % "0.0.7"
 ```
 直接引用jar,在[tieba-api](http://mvnrepository.com/artifact/com.github.libsgh/tieba-api/)或[releases](https://github.com/libsgh/tieba-api/releases)下载最新版
 ```
