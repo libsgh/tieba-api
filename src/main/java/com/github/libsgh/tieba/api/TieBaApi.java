@@ -320,7 +320,6 @@ public class TieBaApi {
 		try {
 			HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss));
 			String result = EntityUtils.toString(response.getEntity());
-			System.out.println(result);
 			return (String) JsonKit.getInfo("tbs", result);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
