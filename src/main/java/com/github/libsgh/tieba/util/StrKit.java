@@ -1,5 +1,7 @@
 package com.github.libsgh.tieba.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 字符串工具类
@@ -72,8 +74,24 @@ public class StrKit {
 		return true;
 	}
     
-    public static void main(String[] args) {
-		String aa = substring("err_no=257&callback=&codeString=jxG7d06c1cb9a79e24402bb14244301457ec6ec980733047b41&userName=809858853%40qq.com&phoneNumber=&mail=&hao", "codeString=", "&");
-		System.out.println(aa);
-    }
+	/**
+	 * 获取指定url中的某个参数
+	 * @param url
+	 * @param name
+	 * @return
+	 */
+	public static String getParamByUrl(String url, String name) {
+	    url += "&";
+	    String pattern = "(\\?|&){1}#{0,1}" + name + "=[a-zA-Z0-9]*(&{1})";
+
+	    Pattern r = Pattern.compile(pattern);
+
+	    Matcher m = r.matcher(url);
+	    if (m.find( )) {
+	        System.out.println(m.group(0));
+	        return m.group(0).split("=")[1].replace("&", "");
+	    } else {
+	        return null;
+	    }
+	}
 }
