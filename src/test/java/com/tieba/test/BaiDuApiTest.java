@@ -244,4 +244,12 @@ public class BaiDuApiTest {
 		System.out.println(api.getCookieFromQRCode("v"));
 	}
 	
+	/**
+	 * 举报
+	 */
+	@Test
+	public void jubao() {
+		System.out.println(api.jubao("FwWElpNHhGdzVJQUVuMHdCSzZBOTBxRm1VUE1FWDV4dHRNR2VvbUFKTDZ5VTVjQVFBQUFBJCQAAAAAAAAAAAEAAACaEH8JwZWRVF~Ex7PBxKwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPo8J1z6PCdccU", "123649521597","10004",""));
+	}
+	
 }
