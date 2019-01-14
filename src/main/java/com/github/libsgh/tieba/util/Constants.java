@@ -49,4 +49,6 @@ public class Constants {
 	public static final String GET_FOLLOW_LIST = "http://c.tieba.baidu.com/c/u/follow/followList";//获取关注列表
 	public static final String GET_FANS_LIST = "http://c.tieba.baidu.com/c/u/fans/page";//获取粉丝列表
 	public static final String REMOVE_FANS = "http://c.tieba.baidu.com/c/c/user/removeFans";//移除粉丝
+	public static final String TOOUSU_CHECK = "http://tieba.baidu.com/complaint/checkjubao?&category=1&pid=%s";//1. 举报提交
+	public static final String TOOUSU_SUBMIT = "http://help.baidu.com/tousu/submit";//2. 举报提交
 }
