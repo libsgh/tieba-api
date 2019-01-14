@@ -53,4 +53,4 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "0.0.8"
  api.getCookieFromQRCode(v);//二维码登录获取cookie(bduss,stoken)
  api.jubao(bduss, "123649521597","10004");//举报帖子
 ```
-基于api实现的贴吧签到系统 [贴吧签到云](https://sign.iicm.tk)
+基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
