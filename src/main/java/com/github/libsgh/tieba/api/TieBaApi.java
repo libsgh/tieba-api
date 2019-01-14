@@ -1442,4 +1442,77 @@ public class TieBaApi {
 		}
 		return "";
 	}
+	
+	/**
+	 * 举报帖子
+	 * @param bduss bduss
+	 * @param pid 帖子id
+	 * @param jubaotype 举报类型
+	 * 10001 低俗色情
+	 * 10002 垃圾广告
+	 * 10002 内容低俗无意义
+	 * 10004 辱骂攻击
+	 * 10005 其他违法信息
+	 * 20001 抄袭我的内容
+	 * 20002 暴露我的隐私
+	 * 20003 内容里有关我的不实描述
+	 * @param reason 举报原因
+	 * @return 举报结果{"errno":21,"msg":"您已举报过该贴，我们将于24小时内通过系统消息发送处理结果。"}，{"errno":0,"msg":"举报成功，我们将于24小时内通过系统消息发送处理结果。"}
+	 */
+	public String jubao(String bduss, String pid, String jubaotype, String reason){
+		try {
+			HttpResponse response = hk.execute(String.format(Constants.TOOUSU_CHECK, pid), createCookie(bduss));
+			String result = EntityUtils.toString(response.getEntity());
+			String url = (String)JSONPath.eval(JSON.parse(result), "$.data.url");
+			if(StrKit.isBlank(url)) {
+				return "{\"errno\":21,\"msg\":\"您已举报过该贴，我们将于24小时内通过系统消息发送处理结果。\"}";
+			}
+			url = url.replaceAll("&amp;", "&");
+			HttpResponse rep2 = hk.execute(url, createCookie(bduss));
+			String add = EntityUtils.toString(rep2.getEntity());
+			Document doc = Jsoup.parse(add);
+			String category  = doc.getElementById("category").val();
+			String product_id  = doc.getElementById("product_id").val();
+			String client  = doc.getElementById("client").val();
+			String submit_token  = doc.getElementById("submit_token").val();
+			String sign  = doc.getElementById("sign").val();
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("product_id", product_id));
+			list.add(new BasicNameValuePair("client", client));
+			list.add(new BasicNameValuePair("category", category));
+			list.add(new BasicNameValuePair("submit_token", submit_token));
+			list.add(new BasicNameValuePair("sign", sign));
+			list.add(new BasicNameValuePair("jubaotype",jubaotype));
+			list.add(new BasicNameValuePair("reason",reason));
+			list.add(new BasicNameValuePair("pid",pid));
+			String submit_r =  EntityUtils.toString(hk.execute(Constants.TOOUSU_SUBMIT,  createCookie(bduss), list).getEntity());
+			Integer code = (Integer)JsonKit.getInfo("errno", submit_r);
+			if(code == 0) {
+				return "{\"errno\":0,\"msg\":\"举报成功，我们将于24小时内通过系统消息发送处理结果。\"}";
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
+	
+	/**
+	 * 举报帖子
+	 * @param bduss bduss
+	 * @param pid 帖子id
+	 * @param jubaotype 举报类型
+	 * 10001 低俗色情
+	 * 10002 垃圾广告
+	 * 10002 内容低俗无意义
+	 * 10004 辱骂攻击
+	 * 10005 其他违法信息
+	 * 20001 抄袭我的内容
+	 * 20002 暴露我的隐私
+	 * 20003 内容里有关我的不实描述
+	 * @return 举报结果{"errno":21,"msg":"您已举报过该贴，我们将于24小时内通过系统消息发送处理结果。"}，{"errno":0,"msg":"举报成功，我们将于24小时内通过系统消息发送处理结果。"}
+	 */
+	public String jubao(String bduss, String pid, String jubaotype){
+		return jubao(bduss, pid, jubaotype, "");
+	}
+	
 }
