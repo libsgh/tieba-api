@@ -16,11 +16,11 @@ maven
 ```
 Gradle
 ```
-implementation 'com.github.libsgh:tieba-api:0.0.7'
+implementation 'com.github.libsgh:tieba-api:0.0.8'
 ```
 SBT
 ```
-libraryDependencies += "com.github.libsgh" % "tieba-api" % "0.0.7"
+libraryDependencies += "com.github.libsgh" % "tieba-api" % "0.0.8"
 ```
 直接引用jar,在[tieba-api](http://mvnrepository.com/artifact/com.github.libsgh/tieba-api/)或[releases](https://github.com/libsgh/tieba-api/releases)下载最新版
 ```
