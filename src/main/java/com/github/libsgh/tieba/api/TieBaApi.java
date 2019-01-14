@@ -1151,7 +1151,7 @@ public class TieBaApi {
 	
 	/**
 	 * 扫描二维码登录获取cookie
-	 * @param v
+	 * @param v v
 	 * @return bduss,stoken
 	 */
 	public Map<String, Object> getCookieFromQRCode(String v){

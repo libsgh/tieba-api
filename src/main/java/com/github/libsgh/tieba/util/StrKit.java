@@ -76,8 +76,8 @@ public class StrKit {
     
 	/**
 	 * 获取指定url中的某个参数
-	 * @param url
-	 * @param name
+	 * @param url url
+	 * @param name name
 	 * @return 参数值
 	 */
 	public static String getParamByUrl(String url, String name) {
