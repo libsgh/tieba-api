@@ -113,8 +113,9 @@ public class HttpKit {
 			if(!StrKit.isBlank(cookie)){
 				//通过header手动设置cookie
 				request.setHeader("Cookie",cookie);
+			}else {
+				localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 			}
-			localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 			response = httpClient.execute(request, localContext);
 			logger.debug("[HTTP状态码:" + response.getStatusLine().getStatusCode() + "]" + "-->Request URL:" + url);
 			int statusCode = response.getStatusLine().getStatusCode();
