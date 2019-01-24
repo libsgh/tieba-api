@@ -2,7 +2,6 @@ package com.github.libsgh.tieba.api;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +42,12 @@ import com.github.libsgh.tieba.util.JsonKit;
 import com.github.libsgh.tieba.util.MD5Kit;
 import com.github.libsgh.tieba.util.StrKit;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.asymmetric.KeyType;
+
 /**
  * 贴吧api
  * @author libs
@@ -79,6 +84,11 @@ public class TieBaApi {
 	 */
 	public Map<String, Object> getBaiDuLoginCookie(String userName, String password, String verifyCode,
 			String codeString, String cookie, String token){
+		String bduss = "";
+    	String stoken = "";
+    	String ptoken = "";
+    	String codestring = "";
+    	Header[] headerArr = null;
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
 			if(StrKit.isBlank(token)){
@@ -87,13 +97,20 @@ public class TieBaApi {
 				//2.保持会话获取token
 				token = this.token();
 			}
-			//1.访问百度首页，获取cookie baiduid
-			//bc.execute(BAIDU_URL,null,null);
-			//2.保持会话获取token
-			//token = this.token();
-			logger.debug("正在登录。");
-			//3.提交百度登录
-			HttpResponse response = hk.execute(Constants.LOGIN_POST_URL, cookie, genercFormEntity(userName,password,token,verifyCode,codeString), null);
+			//3.password 加密
+			String keyInfo = EntityUtils.toString(hk.execute(String.format(Constants.PUB_KEY_URL, api.token(), System.currentTimeMillis()+"")).getEntity());
+			String rsakey = (String) JsonKit.getInfo("key", keyInfo);
+			String pubkey = (String) JsonKit.getInfo("pubkey", keyInfo);
+			pubkey = StrKit.substring(pubkey, "-----BEGIN PUBLIC KEY-----", "-----END PUBLIC KEY-----").replaceAll("\n", "");
+			byte[] encrypt = SecureUtil.rsa(null, pubkey).encrypt(StrUtil.bytes(password, CharsetUtil.CHARSET_UTF_8), KeyType.PublicKey);
+			password = Base64.encode(encrypt);
+			//4.提交百度登录
+			HashMap<String, Header> headerMaps = new HashMap<String, Header>();
+			headerMaps.put("Referer",  new BasicHeader("Referer", "https://www.baidu.com/"));
+			headerMaps.put("Host", new BasicHeader("Host", "passport.baidu.com"));
+			HttpResponse response = hk.execute(Constants.LOGIN_POST_URL, cookie,
+					genercFormEntity(userName, password, token,
+					verifyCode, codeString, rsakey), headerMaps);
 			String result = EntityUtils.toString(response.getEntity());
 			String statusCode = StrKit.substring(result, "err_no=", "&");
 			switch(statusCode) {  
@@ -102,18 +119,7 @@ public class TieBaApi {
 			    	map.put("status", 0);
 					map.put("message", "登录成功");
 					//获取百度cookie（bduss、stoken）
-					map.put("bduss", "");
-					map.put("stoken", "");
-			    break;  
-			    case "18":
-			    	//探测到您的帐号存在安全风险，建议关联手机号提高安全性(未绑定手机)
-			    	map.put("status", 0);
-			    	map.put("message", "登录成功");
-			    	//获取百度cookie（bduss、stoken）
-			    	Header[] headerArr = response.getHeaders("Set-Cookie");
-			    	String bduss = "";
-			    	String stoken = "";
-			    	String ptoken = "";
+			    	headerArr = response.getHeaders("Set-Cookie");
 					for (Header header : headerArr) {
 						String cookieHeader = header.getValue();
 						if(cookieHeader.contains("BDUSS=")){
@@ -129,6 +135,28 @@ public class TieBaApi {
 					logger.debug("ptoken:\t"+ptoken);
 					logger.debug("stoken:\t"+stoken);
 					map.put("stoken", stoken);
+			    break;  
+			    case "18":
+			    	//探测到您的帐号存在安全风险，建议关联手机号提高安全性(未绑定手机)
+			    	map.put("status", 0);
+			    	map.put("message", "登录成功");
+			    	//获取百度cookie（bduss、stoken）
+			    	headerArr = response.getHeaders("Set-Cookie");
+					for (Header header : headerArr) {
+						String cookieHeader = header.getValue();
+						if(cookieHeader.contains("BDUSS=")){
+							bduss = StrKit.substring(cookieHeader, "BDUSS=", ";");
+							map.put("bduss", bduss);
+						}else if(cookieHeader.contains("PTOKEN=")){
+							ptoken = StrKit.substring(cookieHeader, "PTOKEN=", ";");
+							map.put("ptoken", ptoken);
+						}
+					}
+					stoken = hk.doGetStoken(Constants.PASSPORT_AUTH_URL,createCookie(bduss, null, ptoken));
+					logger.info("bduss:\t"+bduss);
+					logger.info("ptoken:\t"+ptoken);
+					logger.info("stoken:\t"+stoken);
+					map.put("stoken", stoken);
 			    	break;  
 			    case "400031":
 			    	//账号开启了登录保护
@@ -142,7 +170,7 @@ public class TieBaApi {
 					break;  
 			    case "257":
 			    	//请输入验证码
-			    	String codestring = StrKit.substring(result, "&codeString=", "&userName");
+			    	codestring = StrKit.substring(result, "&codeString=", "&userName");
 			    	map.put("status", -1);
 					map.put("message", "请输入验证码");
 					map.put("imgUrl", Constants.CAPTCHA_IMG+"?"+codestring);
@@ -152,12 +180,12 @@ public class TieBaApi {
 					break;
 			    case "6":
 			    	//验证码错误
-			    	String codestring1 = StrKit.substring(result, "&codeString=", "&userName");
+			    	codestring = StrKit.substring(result, "&codeString=", "&userName");
 			    	map.put("status", -1);
 			    	map.put("message", "请输入验证码");
-			    	map.put("imgUrl", Constants.CAPTCHA_IMG+"?"+codestring1);
+			    	map.put("imgUrl", Constants.CAPTCHA_IMG+"?"+codestring);
 			    	map.put("cookies", hk.getCookies());
-			    	map.put("codestring", codestring1);
+			    	map.put("codestring", codestring);
 			    	map.put("token", token);
 			    	break;
 			    default:
@@ -173,33 +201,44 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 登录POST参数
-	 * @param userName
-	 * @param password
-	 * @param token
-	 * @param verifyCode
-	 * @param codeString
-	 * @return
-	 * @throws UnsupportedEncodingException
+	 *  登录POST参数
+	 * @param userName 用户名
+	 * @param password 密码 rsa加密 base64
+	 * @param token token
+	 * @param verifyCode 输入的验证码
+	 * @param codeString 验证码图片code
+	 * @param rsakey rsakey
+	 * @return 参数列表
+	 * @throws Exception
 	 */
-	private List<NameValuePair> genercFormEntity(String userName, String password, String token, String verifyCode, String codeString) throws UnsupportedEncodingException{
+	private List<NameValuePair> genercFormEntity(String userName, String password, String token,
+			String verifyCode, String codeString, String rsakey) throws Exception{
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
-		list.add(new BasicNameValuePair("apiver", "v3"));
-		list.add(new BasicNameValuePair("charset", "UTF-8"));
-		list.add(new BasicNameValuePair("codestring", codeString));
-		list.add(new BasicNameValuePair("isPhone", "false"));
-		list.add(new BasicNameValuePair("logintype", "bascilogin"));
-		list.add(new BasicNameValuePair("password", password));
-		list.add(new BasicNameValuePair("ppui_logintime", "8888"));
-		list.add(new BasicNameValuePair("quick_user", "0"));
-		list.add(new BasicNameValuePair("safeflg", "0"));
-		list.add(new BasicNameValuePair("splogin", "rate"));
 		list.add(new BasicNameValuePair("staticpage", "http://tieba.baidu.com/tb/static-common/html/pass/v3Jump.html"));
-		list.add(new BasicNameValuePair("token", token));
+		list.add(new BasicNameValuePair("charset", "UTF-8"));
+		list.add(new BasicNameValuePair("token", api.token()));
 		list.add(new BasicNameValuePair("tpl", "tb"));
-		list.add(new BasicNameValuePair("tt", String.valueOf((System.currentTimeMillis() / 1000)) + "520"));
-		list.add(new BasicNameValuePair("u", "http://tieba.baidu.com/"));
+		list.add(new BasicNameValuePair("apiver", "v3"));
+		list.add(new BasicNameValuePair("tt", System.currentTimeMillis()+""));
+		list.add(new BasicNameValuePair("codestring", codeString));
+		list.add(new BasicNameValuePair("safeflg", "0"));
+		list.add(new BasicNameValuePair("u", "https://tieba.baidu.com/index.html"));
+		list.add(new BasicNameValuePair("isPhone", ""));
+		list.add(new BasicNameValuePair("detect", "1"));
+		list.add(new BasicNameValuePair("gid", StrKit.createGid()));
+		list.add(new BasicNameValuePair("quick_user", "0"));
+		list.add(new BasicNameValuePair("logintype", "logintype"));
+		list.add(new BasicNameValuePair("logLoginType", "pc_loginDialog"));
+		list.add(new BasicNameValuePair("idc", ""));
+		list.add(new BasicNameValuePair("loginmerge", "true"));
+		list.add(new BasicNameValuePair("splogin", "rate"));
 		list.add(new BasicNameValuePair("username", userName));
+		list.add(new BasicNameValuePair("password", password));
+		list.add(new BasicNameValuePair("mem_pass", "on"));
+		list.add(new BasicNameValuePair("rsakey", rsakey));
+		list.add(new BasicNameValuePair("crypttype", "12"));
+		list.add(new BasicNameValuePair("ppui_logintime", "27647"));
+		list.add(new BasicNameValuePair("loginversion", "v4"));
 		list.add(new BasicNameValuePair("verifycode", verifyCode));
 		return list;
 	}
