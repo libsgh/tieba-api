@@ -94,4 +94,23 @@ public class StrKit {
 	        return null;
 	    }
 	}
+	
+	/**
+	 * 生成gid
+	 * @return
+	 */
+	public static String createGid() {
+		String platString = "xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+        return platString.chars().mapToObj(c -> {
+            String d = String.valueOf((char) c);
+            int t = (int) (16 * Math.random()) | 0;
+            if (c == 'x') {
+                d = Integer.toHexString(t).toUpperCase();
+            } else if (c == 'y') {
+                d = Integer.toHexString(3 & t | 8).toUpperCase();
+            }
+            return d;
+        }).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
+	}
+	
 }
