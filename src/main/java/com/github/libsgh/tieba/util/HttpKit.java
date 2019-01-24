@@ -43,7 +43,7 @@ public class HttpKit {
 	private CookieStore cookieStore = new BasicCookieStore();
 	
 	private static String Content_Type = "application/x-www-form-urlencoded";
-	private static String User_Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36";
+	private static String User_Agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
 	private HttpKit(){}
 	
 	public static HttpKit getInstance(){
@@ -113,10 +113,11 @@ public class HttpKit {
 			if(!StrKit.isBlank(cookie)){
 				//通过header手动设置cookie
 				request.setHeader("Cookie",cookie);
+				response = httpClient.execute(request);
 			}else {
 				localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
+				response = httpClient.execute(request, localContext);
 			}
-			response = httpClient.execute(request, localContext);
 			logger.debug("[HTTP状态码:" + response.getStatusLine().getStatusCode() + "]" + "-->Request URL:" + url);
 			int statusCode = response.getStatusLine().getStatusCode();
 			if(statusCode == HttpStatus.SC_OK){//200
