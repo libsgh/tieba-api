@@ -10,6 +10,7 @@ public class Constants {
 	public static final String BAIDU_URL = "http://www.baidu.com";//百度首页
 	public static final String TOKEN_GET_URL = "https://passport.baidu.com/v2/api/?getapi&tpl=mn&apiver=v3&class=login&logintype=dialogLogin";//登陆token
 	public static final String LOGIN_POST_URL = "https://passport.baidu.com/v2/api/?login";//登陆 post url
+	public static final String PUB_KEY_URL = "https://passport.baidu.com/v2/getpublickey?token=%s&tpl=tb&apiver=v3&tt=%s&gid=&loginversion=v4&traceid=";//获取RSA公钥
 	public static final String TIEBA_GET_URL = "https://tieba.baidu.com";//贴吧地址
 	public static final String TBS_URL = "http://tieba.baidu.com/dc/common/tbs";//tbs 获取随机参数（好多请求用到）
 	public static final String USER_INFO_GET_URL = "http://tieba.baidu.com/f/user/json_userinfo";//获取用户json信息
