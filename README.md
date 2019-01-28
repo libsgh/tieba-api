@@ -1,6 +1,6 @@
 # tieba-api
 [![language](https://img.shields.io/badge/language-java-blue.svg)](https://www.java.com)
-[![version](https://img.shields.io/badge/version-v0.0.9-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/0.0.9)
+[![version](https://img.shields.io/badge/version-v1.0.0-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.0)
 [![GitHub license](https://img.shields.io/github/license/libsgh/tieba-api.svg)](https://github.com/libsgh/tieba-api/blob/master/LICENSE)
 
 
@@ -16,11 +16,11 @@ maven
 ```
 Gradle
 ```
-implementation 'com.github.libsgh:tieba-api:0.0.9'
+implementation 'com.github.libsgh:tieba-api:1.0.0'
 ```
 SBT
 ```
-libraryDependencies += "com.github.libsgh" % "tieba-api" % "0.0.9"
+libraryDependencies += "com.github.libsgh" % "tieba-api" % "1.0.0"
 ```
 直接引用jar,在[tieba-api](http://mvnrepository.com/artifact/com.github.libsgh/tieba-api/)或[releases](https://github.com/libsgh/tieba-api/releases)下载最新版
 ```
@@ -52,5 +52,6 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "0.0.9"
  api.islogin(bduss);//检测bduss有效性
  api.getCookieFromQRCode(v);//二维码登录获取cookie(bduss,stoken)
  api.jubao(bduss, "123649521597","10004");//举报帖子
+ api.isFocus("bug", bduss, stoken);//是否关注某个贴吧
 ```
 基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
