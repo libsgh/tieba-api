@@ -78,6 +78,10 @@ public class BaiDuApiTest {
 		
 	}
 	
+	@Test
+	public void tbs() {
+		System.out.println(api.getTbs(bduss));
+	}
 	/**
 	 * 获取我喜欢的贴吧
 	 */
@@ -233,7 +237,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void isLogin() {
-		System.out.println(api.islogin(bduss));
+		System.out.println(api.islogin(bduss, stoken));
 	}
 	
 	/**
@@ -250,6 +254,14 @@ public class BaiDuApiTest {
 	@Test
 	public void jubao() {
 		System.out.println(api.jubao(bduss, "123649521597","10004",""));
+	}
+	
+	/**
+	 * 查询是否关注某个贴吧
+	 */
+	@Test
+	public void isFocus() {
+		System.out.println(api.isFocus("bug", bduss, stoken));
 	}
 	
 }

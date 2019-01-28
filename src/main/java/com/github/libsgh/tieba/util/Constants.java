@@ -38,7 +38,7 @@ public class Constants {
 	public static final String FOLLOW = "http://c.tieba.baidu.com/c/c/user/follow";//关注某人
 	public static final String UNFOLLOW = "http://c.tieba.baidu.com/c/c/user/unfollow";//取消关注某人
 	public static final String F_PAGE = "http://c.tieba.baidu.com/c/f/pb/page";//帖子信息
-	public static final String TULING_KEY = "b89fdcd52ed747e28bda2f6d8750889a";//tuling_key
+	public static final String TIEBA_URL = "https://tieba.baidu.com/f?kw=%s&ie=utf-8";//某个贴吧url
 	public static final String SEARCH_FRIEND = "http://c.tieba.baidu.com/c/r/friend/searchFriend";//获取用户信息
 	public static final String GET_USER_TIEBA = "http://c.tieba.baidu.com/c/f/forum/like";//获取用户关注的贴吧
 	public static final String LIKE_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/like";//关注一个贴吧

@@ -293,14 +293,14 @@ public class TieBaApi {
 	 * @param tbName 想要签到的贴吧
 	 * @param fid 贴吧fid
 	 * @param bduss bduss
+	 * @param bduss tbs
 	 * @return 签到结果
 	 */
 	@SuppressWarnings({ "resource", "unchecked" })
-	public Map<String, Object> signOneTieBa(String tbName, int fid, String bduss){
+	public Map<String, Object> signOneTieBa(String tbName, int fid, String bduss, String tbs){
 		Map<String, Object> tb = new HashMap<String, Object>();
 		try {
 			List<NameValuePair> list = new ArrayList<NameValuePair>();
-			//list.add(new BasicNameValuePair("BDUSS", substring(cookie, "BDUSS=", ";")));
 			list.add(new BasicNameValuePair("BDUSS", bduss));
 			list.add(new BasicNameValuePair("_client_id", "03-00-DA-59-05-00-72-96-06-00-01-00-04-00-4C-43-01-00-34-F4-02-00-BC-25-09-00-4E-36"));
 			list.add(new BasicNameValuePair("_client_type", "4"));
@@ -309,7 +309,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("fid",  new Formatter().format("%d", fid).toString()));
 			list.add(new BasicNameValuePair("kw", tbName));
 			list.add(new BasicNameValuePair("net_type", "3"));
-			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
+			list.add(new BasicNameValuePair("tbs", tbs));
 			String signStr = "";
 			for (NameValuePair nameValuePair : list) {
 				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
@@ -348,6 +348,17 @@ public class TieBaApi {
 			logger.error(e.getMessage(), e);
 		}
         return tb;
+	}
+	
+	/**
+	 * 执行签到（尽量不要每个贴吧签到都获取tbs，因为频繁的获取tbs可能会导致404，每个用户在签到前获取一次就行）
+	 * @param tbName 贴吧名称
+	 * @param fid 贴吧fid
+	 * @param bduss bduss
+	 * @return 签到结果
+	 */
+	public Map<String, Object> signOneTieBa(String tbName, int fid, String bduss){
+		return this.signOneTieBa(tbName, fid, bduss, getTbs(bduss));
 	}
 	
 	/**
@@ -1149,11 +1160,12 @@ public class TieBaApi {
 	/**
 	 * bduss有效性检测(是否是登录状态)
 	 * @param bduss bduss
+	 * @param stoken stoken
 	 * @return true or false
 	 */
-	public boolean islogin(String bduss){
+	public boolean islogin(String bduss, String stoken){
 		try {
-			HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss));
+			HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss, stoken));
 			String result = EntityUtils.toString(response.getEntity());
 			return (Integer) JsonKit.getInfo("is_login", result)==1?true:false;
 		} catch (Exception e) {
@@ -1552,6 +1564,26 @@ public class TieBaApi {
 	 */
 	public String jubao(String bduss, String pid, String jubaotype){
 		return jubao(bduss, pid, jubaotype, "");
+	}
+	
+	/**
+	 * 查询是否关注某个贴吧
+	 * @param tbName 贴吧名称
+	 * @param bduss bduss
+	 * @param stoken stoken
+	 * @return true or false
+	 */
+	public Boolean isFocus(String tbName, String bduss, String stoken) {
+		try {
+			HttpResponse response = hk.execute(String.format(Constants.TIEBA_URL, tbName),  createCookie(bduss, stoken));
+			String result = EntityUtils.toString(response.getEntity());
+			if(StrKit.substring(result, "'islike': '", "'").equals("1")) {
+				return true;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return false;
 	}
 	
 }
