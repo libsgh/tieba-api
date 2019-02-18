@@ -16,11 +16,11 @@ maven
 ```
 Gradle
 ```
-implementation 'com.github.libsgh:tieba-api:1.0.0'
+implementation 'com.github.libsgh:tieba-api:1.0.1'
 ```
 SBT
 ```
-libraryDependencies += "com.github.libsgh" % "tieba-api" % "1.0.0"
+libraryDependencies += "com.github.libsgh" % "tieba-api" % "1.0.1"
 ```
 直接引用jar,在[tieba-api](http://mvnrepository.com/artifact/com.github.libsgh/tieba-api/)或[releases](https://github.com/libsgh/tieba-api/releases)下载最新版
 ```
@@ -28,6 +28,7 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "1.0.0"
  api.reply(bduss, "5635882244", "bug", "#bug吧#回帖接口测试", 0);//回帖
  api.getIndexTList("bug",1);//获取首页帖子数组
  api.oneBtnToSign(bduss, stoken);//一键签到
+ api.oneBtnToSign(bduss);//一键签到
  api.signOneTieBa("姜敏京", 282280, bduss);//签到一个贴吧
  api.getHideTbs(username);//获取用户所有贴吧(隐藏贴吧)
  api.getMyLikedTB(bduss, stoken);//获取我喜欢的贴吧
@@ -53,5 +54,9 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "1.0.0"
  api.getCookieFromQRCode(v);//二维码登录获取cookie(bduss,stoken)
  api.jubao(bduss, "123649521597","10004");//举报帖子
  api.isFocus("bug", bduss, stoken);//是否关注某个贴吧
+ api.isFocus("bug", bduss);//是否关注某个贴吧
+ api.getFullNameByPanUrl("panUrl");//根据百度盘分享url查询完整用户名（大部分可查）
 ```
 基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
+基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
+
