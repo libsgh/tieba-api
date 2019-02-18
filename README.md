@@ -57,7 +57,7 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "1.0.1"
  api.isFocus("bug", bduss);//是否关注某个贴吧
  api.getFullNameByPanUrl("panUrl");//根据百度盘分享url查询完整用户名（大部分可查）
 ```
-基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com
+基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
 
 基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
 
