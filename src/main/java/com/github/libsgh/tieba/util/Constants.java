@@ -7,7 +7,7 @@ package com.github.libsgh.tieba.util;
  */
 public class Constants {
 	
-	public static final String BAIDU_URL = "http://www.baidu.com";//百度首页
+	public static final String BAIDU_URL = "https://www.baidu.com";//百度首页
 	public static final String TOKEN_GET_URL = "https://passport.baidu.com/v2/api/?getapi&tpl=mn&apiver=v3&class=login&logintype=dialogLogin";//登陆token
 	public static final String LOGIN_POST_URL = "https://passport.baidu.com/v2/api/?login";//登陆 post url
 	public static final String PUB_KEY_URL = "https://passport.baidu.com/v2/getpublickey?token=%s&tpl=tb&apiver=v3&tt=%s&gid=&loginversion=v4&traceid=";//获取RSA公钥
@@ -52,4 +52,5 @@ public class Constants {
 	public static final String REMOVE_FANS = "http://c.tieba.baidu.com/c/c/user/removeFans";//移除粉丝
 	public static final String TOOUSU_CHECK = "http://tieba.baidu.com/complaint/checkjubao?&category=1&pid=%s";//1. 举报提交
 	public static final String TOOUSU_SUBMIT = "http://help.baidu.com/tousu/submit";//2. 举报提交
+	public static final String ZHIDAO_USER_CENTER = "https://zhidao.baidu.com/usercenter?uid=%s";//知道用户中心，用于查询完整用户名
 }

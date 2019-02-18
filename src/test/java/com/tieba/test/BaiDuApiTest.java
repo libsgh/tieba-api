@@ -50,10 +50,10 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void oneBtnToSign() {
-		Map<String, Object> msg = api.oneBtnToSign(bduss, stoken);
+		//Map<String, Object> msg = api.oneBtnToSign(bduss, stoken);
+		Map<String, Object> msg = api.oneBtnToSign(bduss);
 		String result = JSONObject.toJSONString(msg);
 		logger.info(result);
-		
 	}
 	
 	/**
@@ -146,7 +146,6 @@ public class BaiDuApiTest {
 	public void floorpid() {
 		List<ReplyInfo> list = api.getMsg(bduss, "reply", 1);
 		for (ReplyInfo replyInfo : list) {
-			System.out.println(JSONObject.toJSONString(replyInfo));
 			logger.info(api.floorpid(bduss, replyInfo.getThread_id(), replyInfo.getPost_id()));
 		}
 	}
@@ -238,6 +237,7 @@ public class BaiDuApiTest {
 	@Test
 	public void isLogin() {
 		System.out.println(api.islogin(bduss, stoken));
+		System.out.println(api.islogin(bduss));
 	}
 	
 	/**
@@ -262,6 +262,14 @@ public class BaiDuApiTest {
 	@Test
 	public void isFocus() {
 		System.out.println(api.isFocus("bug", bduss, stoken));
+		System.out.println(api.isFocus("bug", bduss));
 	}
 	
+	/**
+	 * 根据百度盘分享链接获取完整用户名
+	 */
+	@Test
+	public void getFullNameByPanUrl() {
+		System.out.println(api.getFullNameByPanUrl("https://pan.baidu.com/wap/init?surl=NGAyTDnx2JNAw9Lj5-oD5w"));
+	}
 }

@@ -271,12 +271,13 @@ public class TieBaApi {
 		Map<String, Object> msg = new HashMap<String, Object>();
 		//1.先获取用户关注的贴吧
 		List<MyTB> list = getMyLikedTB(bduss, stoken);
+		String tbs = this.getTbs(bduss);
 		int totalCount = list.size();
 		//2.一键签到
 		List<Map<String, Object>> results = list.stream()
 			.parallel()
 			.map(tb -> {
-				return this.signOneTieBa(tb.getTbName(), tb.getFid(), bduss);
+				return this.signOneTieBa(tb.getTbName(), tb.getFid(), bduss, tbs);
 		}).collect(Collectors.toList());
 		long signCount = results.stream().filter(r -> r.get("error_code").toString().equals("0")).count();
 		long signedCount = results.stream().filter(r -> r.get("error_code").toString().equals("160002")).count();
@@ -1163,7 +1164,7 @@ public class TieBaApi {
 	 * @param stoken stoken
 	 * @return true or false
 	 */
-	public boolean islogin(String bduss, String stoken){
+	public Boolean islogin(String bduss, String stoken){
 		try {
 			HttpResponse response = hk.execute(Constants.TBS_URL, this.createCookie(bduss, stoken));
 			String result = EntityUtils.toString(response.getEntity());
@@ -1172,6 +1173,27 @@ public class TieBaApi {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
+	}
+	
+	/**
+	 * bduss有效性检测(是否是登录状态)
+	 * @param bduss bduss
+	 * @return true or false
+	 */
+	public Boolean islogin(String bduss) {
+		try {
+			HttpResponse response = hk.execute(Constants.BAIDU_URL, createCookie(bduss));
+			String html = EntityUtils.toString(response.getEntity());
+			Document doc = Jsoup.parse(html);
+			if(doc.getElementsByClass("user-name").hasText()) {
+				return true;
+			}else{
+				return false;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return false;
 	}
 	
 	/**
@@ -1586,4 +1608,104 @@ public class TieBaApi {
 		return false;
 	}
 	
+	/**
+	 * 查询是否关注某个贴吧
+	 * @param tbName 贴吧名称
+	 * @param bduss
+	 * @return true or false
+	 */
+	public Boolean isFocus(String tbName, String bduss) {
+		HttpKit hk = HttpKit.getInstance();
+		Boolean flag = false;
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("BDUSS", bduss));
+			list.add(new BasicNameValuePair("fid", api.getFid(tbName)));
+			list.add(new BasicNameValuePair("kw", tbName));
+			list.add(new BasicNameValuePair("tbs", api.getTbs(bduss)));
+			String signStr = "";
+			for (NameValuePair nameValuePair : list) {
+				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+			}
+			signStr += "tiebaclient!!!";
+			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			HttpResponse response = hk.execute(Constants.LIKE_TIEBA_URL, null, list);
+			String fr = EntityUtils.toString(response.getEntity());
+			Integer isLike = (Integer)JSONPath.eval(JSON.parse(fr), "$.info.is_like");
+			if(isLike == 1) {
+				flag = true;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		if(flag == false) {
+			//查询结果后如果未关注，需要取消关注
+			this.unfocus(bduss, tbName);
+		}
+		return flag;
+	}
+	
+	/**
+	 * 根据百度盘分享url查询完整用户名（大部分可查）
+	 * @param panUrl 百度云盘分享url
+	 * @return 完整用户名
+	 */
+	public String getFullNameByPanUrl(String panUrl) {
+		try {
+			String html = EntityUtils.toString(hk.execute(panUrl).getEntity());
+			String portrait = StrKit.substring(html, "item/", ".");
+			String bb =  EntityUtils.toString(hk.execute(String.format(Constants.ZHIDAO_USER_CENTER, portrait)).getEntity());
+			String uname = Jsoup.parse(bb).select(".name-wp span").text();
+			return uname;
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取用户名
+	 * @param bduss bduss
+	 * @return 用户名
+	 */
+	public String getUserName(String bduss) {
+		try {
+			String result = EntityUtils.toString(hk
+					.execute(Constants.BAIDU_URL,createCookie(bduss)).getEntity());
+			Document doc = Jsoup.parse(result);
+			String username = doc.getElementsByClass("user-name").text();
+			return username;
+		}catch (Exception e) {
+		}
+		return null;
+	}
+	
+	/**
+	 * 一键签到
+	 * @param bduss bduss
+	 * @return 签到结果
+	 */
+	public Map<String, Object> oneBtnToSign(String bduss) {
+		Long start = System.currentTimeMillis();
+		Map<String, Object> msg = new HashMap<String, Object>();
+		//1.先获取用户关注的贴吧
+		List<Map<String, Object>> list = getHideTbs(getUserName(bduss));
+		String tbs = this.getTbs(bduss);
+		int totalCount = list.size();
+		//2.一键签到
+		List<Map<String, Object>> results = list.stream()
+			.parallel()
+			.map(p -> {
+				return this.signOneTieBa(p.get("name").toString(), Integer.parseInt(p.get("id").toString()), bduss, tbs);
+		}).collect(Collectors.toList());
+		long signCount = results.stream().filter(r -> r.get("error_code").toString().equals("0")).count();
+		long signedCount = results.stream().filter(r -> r.get("error_code").toString().equals("160002")).count();
+		msg.put("用户贴吧数", totalCount);
+		msg.put("签到成功", signCount);
+		msg.put("已签到", signedCount);
+		msg.put("签到失败", (totalCount - signedCount - signCount));
+		msg.put("耗时", (System.currentTimeMillis()-start)+"ms");
+		return msg;
+	}
+
 }
