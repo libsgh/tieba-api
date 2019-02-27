@@ -97,7 +97,7 @@ public class StrKit {
 	
 	/**
 	 * 生成gid
-	 * @return
+	 * @return gid
 	 */
 	public static String createGid() {
 		String platString = "xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
