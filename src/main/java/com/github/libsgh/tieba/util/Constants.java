@@ -38,7 +38,8 @@ public class Constants {
 	public static final String FOLLOW = "http://c.tieba.baidu.com/c/c/user/follow";//关注某人
 	public static final String UNFOLLOW = "http://c.tieba.baidu.com/c/c/user/unfollow";//取消关注某人
 	public static final String F_PAGE = "http://c.tieba.baidu.com/c/f/pb/page";//帖子信息
-	public static final String TIEBA_URL = "https://tieba.baidu.com/f?kw=%s&ie=utf-8";//某个贴吧url
+	public static final String TIEBA_URL_HTTPS = "https://tieba.baidu.com/f?kw=%s&ie=utf-8";//某个贴吧url
+	public static final String TIEBA_URL_HTTP = "http://tieba.baidu.com/f?kw=%s&ie=utf-8";//某个贴吧url
 	public static final String SEARCH_FRIEND = "http://c.tieba.baidu.com/c/r/friend/searchFriend";//获取用户信息
 	public static final String GET_USER_TIEBA = "http://c.tieba.baidu.com/c/f/forum/like";//获取用户关注的贴吧
 	public static final String LIKE_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/like";//关注一个贴吧
@@ -53,4 +54,6 @@ public class Constants {
 	public static final String TOOUSU_CHECK = "http://tieba.baidu.com/complaint/checkjubao?&category=1&pid=%s";//1. 举报提交
 	public static final String TOOUSU_SUBMIT = "http://help.baidu.com/tousu/submit";//2. 举报提交
 	public static final String ZHIDAO_USER_CENTER = "https://zhidao.baidu.com/usercenter?uid=%s";//知道用户中心，用于查询完整用户名
+	public static final String GET_FORUM_SUPPORT = "http://tieba.baidu.com/celebrity/submit/getForumSupport";//1.名人堂助攻
+	public static final String FORUM_SUPPORT = "http://tieba.baidu.com/celebrity/submit/support";//2。名人堂助攻
 }
