@@ -1,6 +1,6 @@
 # tieba-api
 [![language](https://img.shields.io/badge/language-java-blue.svg)](https://www.java.com)
-[![version](https://img.shields.io/badge/version-v1.0.0-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.0)
+[![version](https://img.shields.io/badge/version-v1.0.2-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.2)
 [![GitHub license](https://img.shields.io/github/license/libsgh/tieba-api.svg)](https://github.com/libsgh/tieba-api/blob/master/LICENSE)
 
 
@@ -16,11 +16,11 @@ maven
 ```
 Gradle
 ```
-implementation 'com.github.libsgh:tieba-api:1.0.1'
+implementation 'com.github.libsgh:tieba-api:${lastVersion}'
 ```
 SBT
 ```
-libraryDependencies += "com.github.libsgh" % "tieba-api" % "1.0.1"
+libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
 ```
 直接引用jar,在[tieba-api](http://mvnrepository.com/artifact/com.github.libsgh/tieba-api/)或[releases](https://github.com/libsgh/tieba-api/releases)下载最新版
 ```
@@ -56,6 +56,7 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "1.0.1"
  api.isFocus("bug", bduss, stoken);//是否关注某个贴吧
  api.isFocus("bug", bduss);//是否关注某个贴吧
  api.getFullNameByPanUrl("panUrl");//根据百度盘分享url查询完整用户名（大部分可查）
+ api.support(bduss, "柯南");//助攻名人堂
 ```
 基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
 
