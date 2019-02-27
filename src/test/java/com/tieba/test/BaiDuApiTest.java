@@ -272,4 +272,12 @@ public class BaiDuApiTest {
 	public void getFullNameByPanUrl() {
 		System.out.println(api.getFullNameByPanUrl("https://pan.baidu.com/wap/init?surl=NGAyTDnx2JNAw9Lj5-oD5w"));
 	}
+	
+	/**
+	 * 名人堂助攻
+	 */
+	@Test
+	public void support() {
+		System.out.println(api.support(bduss, "柯南"));
+	}
 }
