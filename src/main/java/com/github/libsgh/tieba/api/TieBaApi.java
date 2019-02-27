@@ -294,7 +294,7 @@ public class TieBaApi {
 	 * @param tbName 想要签到的贴吧
 	 * @param fid 贴吧fid
 	 * @param bduss bduss
-	 * @param bduss tbs
+	 * @param tbs tbs
 	 * @return 签到结果
 	 */
 	@SuppressWarnings({ "resource", "unchecked" })
@@ -1614,7 +1614,7 @@ public class TieBaApi {
 	/**
 	 * 查询是否关注某个贴吧
 	 * @param tbName 贴吧名称
-	 * @param bduss
+	 * @param bduss bduss
 	 * @return true or false
 	 */
 	public Boolean isFocus(String tbName, String bduss) {
