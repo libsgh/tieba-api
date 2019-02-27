@@ -1597,7 +1597,10 @@ public class TieBaApi {
 	 */
 	public Boolean isFocus(String tbName, String bduss, String stoken) {
 		try {
-			HttpResponse response = hk.execute(String.format(Constants.TIEBA_URL, tbName),  createCookie(bduss, stoken));
+			HttpResponse response = hk.execute(String.format(Constants.TIEBA_URL_HTTPS, tbName),  createCookie(bduss, stoken));
+			if(response == null) {
+				response  = hk.execute(String.format(Constants.TIEBA_URL_HTTP, tbName),  createCookie(bduss, stoken));
+			}
 			String result = EntityUtils.toString(response.getEntity());
 			if(StrKit.substring(result, "'islike': '", "'").equals("1")) {
 				return true;
@@ -1707,5 +1710,54 @@ public class TieBaApi {
 		msg.put("耗时", (System.currentTimeMillis()-start)+"ms");
 		return msg;
 	}
-
+	
+	/**
+	 * 名人堂助攻
+	 * @param bduss bduss
+	 * @param tbName 贴吧名称
+	 * @return 结果
+	 * no=210009 //不在名人堂
+	 * no=3110004 //暂未关注
+	 * no=2280006 //已助攻
+	 * no=0 //成功
+	 */
+	public String support(String bduss, String tbName) {
+		return support(bduss, tbName, getTbs(bduss));
+	}
+	/**
+	 * 名人堂助攻
+	 * @param bduss bduss
+	 * @param tbName 贴吧名称
+	 * @param tbs tbs
+	 * @return 结果
+	 * no=210009 //不在名人堂
+	 * no=3110004 //暂未关注
+	 * no=2280006 //已助攻
+	 * no=0 //成功
+	 */
+	public String support(String bduss, String tbName, String tbs) {
+		String suportResult = "";
+		try {
+			HttpResponse hp = hk.execute(String.format(Constants.TIEBA_URL_HTTPS, tbName));
+			if(hp == null) {
+				hp = hk.execute(String.format(Constants.TIEBA_URL_HTTP, tbName));
+			}
+			String fidHtml= EntityUtils.toString(hp.getEntity());
+			String fid = StrKit.substring(fidHtml, "forum_id\":", ",");
+			String cookie = createCookie(bduss);
+			List<NameValuePair> params = new ArrayList<>();
+			params.add(new BasicNameValuePair("forum_id", fid));
+			params.add(new BasicNameValuePair("tbs", tbs));
+			//3.获取npc_id
+			String result = EntityUtils.toString(hk.execute(Constants.GET_FORUM_SUPPORT, cookie, params).getEntity());
+			String npcId = JSONPath.eval(JSON.parse(result), "$.data[0].npc_info.npc_id").toString();
+			params.add(new BasicNameValuePair("npc_id", npcId));
+			//3.助攻
+			suportResult = EntityUtils.toString(hk.execute(Constants.FORUM_SUPPORT,cookie, params).getEntity());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return suportResult;
+	}
+	
 }
