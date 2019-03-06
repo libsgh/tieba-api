@@ -38,7 +38,8 @@ public class Constants {
 	public static final String FOLLOW = "http://c.tieba.baidu.com/c/c/user/follow";//关注某人
 	public static final String UNFOLLOW = "http://c.tieba.baidu.com/c/c/user/unfollow";//取消关注某人
 	public static final String F_PAGE = "http://c.tieba.baidu.com/c/f/pb/page";//帖子信息
-	public static final String TIEBA_URL = "https://tieba.baidu.com/f?kw=%s&ie=utf-8";//某个贴吧url
+	public static final String TIEBA_URL_HTTPS = "https://tieba.baidu.com/f?kw=%s&ie=utf-8";//某个贴吧url
+	public static final String TIEBA_URL_HTTP = "http://tieba.baidu.com/f?kw=%s&ie=utf-8";//某个贴吧url
 	public static final String SEARCH_FRIEND = "http://c.tieba.baidu.com/c/r/friend/searchFriend";//获取用户信息
 	public static final String GET_USER_TIEBA = "http://c.tieba.baidu.com/c/f/forum/like";//获取用户关注的贴吧
 	public static final String LIKE_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/like";//关注一个贴吧
@@ -55,4 +56,6 @@ public class Constants {
 	public static final String ZHIDAO_USER_CENTER = "https://zhidao.baidu.com/usercenter?uid=%s";//知道用户中心，用于查询完整用户名
 	public static final String LEBO_API = "http://leboapi.baidu.com/leboapi/user?type=getUserDetail&uid=8889&apiver=2&from=leboios&terminal=ios&app=121&did=fce78749b15e3c2e5ec415a6e79f4000ba141da9&channel=AppStore&clientver=21609&sysver=9.0.2";//BDUSS查询用户信息
 	public static final String GET_USER_PROFILE = "http://ce.baidu.com/site/getUserProfile";//BDUSS查询用户名和头像
+	public static final String GET_FORUM_SUPPORT = "http://tieba.baidu.com/celebrity/submit/getForumSupport";//1.名人堂助攻
+	public static final String FORUM_SUPPORT = "http://tieba.baidu.com/celebrity/submit/support";//2。名人堂助攻
 }
