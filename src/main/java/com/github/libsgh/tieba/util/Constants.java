@@ -53,4 +53,6 @@ public class Constants {
 	public static final String TOOUSU_CHECK = "http://tieba.baidu.com/complaint/checkjubao?&category=1&pid=%s";//1. 举报提交
 	public static final String TOOUSU_SUBMIT = "http://help.baidu.com/tousu/submit";//2. 举报提交
 	public static final String ZHIDAO_USER_CENTER = "https://zhidao.baidu.com/usercenter?uid=%s";//知道用户中心，用于查询完整用户名
+	public static final String LEBO_API = "http://leboapi.baidu.com/leboapi/user?type=getUserDetail&uid=8889&apiver=2&from=leboios&terminal=ios&app=121&did=fce78749b15e3c2e5ec415a6e79f4000ba141da9&channel=AppStore&clientver=21609&sysver=9.0.2";//BDUSS查询用户信息
+	public static final String GET_USER_PROFILE = "http://ce.baidu.com/site/getUserProfile";//BDUSS查询用户名和头像
 }
