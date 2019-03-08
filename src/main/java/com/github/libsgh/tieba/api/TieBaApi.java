@@ -98,7 +98,7 @@ public class TieBaApi {
 				token = this.token();
 			}
 			//3.password 加密
-			String keyInfo = EntityUtils.toString(hk.execute(String.format(Constants.PUB_KEY_URL, api.token(), System.currentTimeMillis()+"")).getEntity());
+			String keyInfo = EntityUtils.toString(hk.execute(String.format(Constants.PUB_KEY_URL, token, System.currentTimeMillis()+"")).getEntity());
 			String rsakey = (String) JsonKit.getInfo("key", keyInfo);
 			String pubkey = (String) JsonKit.getInfo("pubkey", keyInfo);
 			pubkey = StrKit.substring(pubkey, "-----BEGIN PUBLIC KEY-----", "-----END PUBLIC KEY-----").replaceAll("\n", "");
