@@ -1597,8 +1597,10 @@ public class TieBaApi {
 	 */
 	public Boolean isFocus(String tbName, String bduss, String stoken) {
 		try {
-			HttpResponse response = hk.execute(String.format(Constants.TIEBA_URL, tbName),  createCookie(bduss, stoken));
+			HttpResponse response = hk.execute(String.format(Constants.TIEBA_URL_HTTPS, tbName),  createCookie(bduss, stoken));
 			String result = EntityUtils.toString(response.getEntity());
+
+			System.out.println(result);
 			if(StrKit.substring(result, "'islike': '", "'").equals("1")) {
 				return true;
 			}
@@ -1623,16 +1625,16 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("fid", api.getFid(tbName)));
 			list.add(new BasicNameValuePair("kw", tbName));
 			list.add(new BasicNameValuePair("tbs", api.getTbs(bduss)));
-			String signStr = "";
+			StringBuffer signStr = new StringBuffer();
 			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
+				signStr.append(new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString());
 			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			signStr.append("tiebaclient!!!");
+			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr.toString()).toUpperCase()));
 			HttpResponse response = hk.execute(Constants.LIKE_TIEBA_URL, null, list);
 			String fr = EntityUtils.toString(response.getEntity());
 			Integer isLike = (Integer)JSONPath.eval(JSON.parse(fr), "$.info.is_like");
-			if(isLike == 1) {
+			if(isLike != null && isLike == 1) {
 				flag = true;
 			}
 		} catch (Exception e) {
