@@ -1599,8 +1599,6 @@ public class TieBaApi {
 		try {
 			HttpResponse response = hk.execute(String.format(Constants.TIEBA_URL_HTTPS, tbName),  createCookie(bduss, stoken));
 			String result = EntityUtils.toString(response.getEntity());
-
-			System.out.println(result);
 			if(StrKit.substring(result, "'islike': '", "'").equals("1")) {
 				return true;
 			}
