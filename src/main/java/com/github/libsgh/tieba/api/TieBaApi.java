@@ -39,7 +39,6 @@ import com.github.libsgh.tieba.model.ReplyInfo;
 import com.github.libsgh.tieba.util.Constants;
 import com.github.libsgh.tieba.util.HttpKit;
 import com.github.libsgh.tieba.util.JsonKit;
-import com.github.libsgh.tieba.util.MD5Kit;
 import com.github.libsgh.tieba.util.StrKit;
 
 import cn.hutool.core.codec.Base64;
@@ -311,12 +310,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("kw", tbName));
 			list.add(new BasicNameValuePair("net_type", "3"));
 			list.add(new BasicNameValuePair("tbs", tbs));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			
 			HttpResponse response = hk.execute(Constants.SIGN_POST_URL, createCookie(bduss), list);
 	        String result = EntityUtils.toString(response.getEntity());
@@ -391,12 +385,7 @@ public class TieBaApi {
 		try {
 			list.add(new BasicNameValuePair("search_key", username));
 			list.add(new BasicNameValuePair("_client_version", "6.2.2"));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.SEARCH_FRIEND, null, list);
 			String result = EntityUtils.toString(response.getEntity());
 			if(!JsonKit.getInfo("errorno", result).toString().equals("0")) {
@@ -433,12 +422,7 @@ public class TieBaApi {
 		   list.add(new BasicNameValuePair("has_plist", "2"));//1可以显示回帖信息
 		   list.add(new BasicNameValuePair("need_post_count", "1"));//查看回帖发帖数量必填
 		   list.add(new BasicNameValuePair("uid", uid));//用户的uid  必填
-		   String signStr = "";
-		   for (NameValuePair nameValuePair : list) {
-				   	signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.USER_PROFILE, null, list);
 			result = EntityUtils.toString(response.getEntity());
 		} catch (ParseException e) {
@@ -485,12 +469,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("portrait", portrait));
 			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
 			list.add(new BasicNameValuePair("timestamp", String.valueOf(System.currentTimeMillis())));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.FOLLOW, null, list);
 			String result = EntityUtils.toString(response.getEntity());
 			return result;
@@ -518,12 +497,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("portrait", portrait));
 			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
 			list.add(new BasicNameValuePair("timestamp", String.valueOf(System.currentTimeMillis())));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.UNFOLLOW, null, list);
 			String result = EntityUtils.toString(response.getEntity());
 			return result;
@@ -551,12 +525,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("fid", fid));
 			list.add(new BasicNameValuePair("kw", kw));
 			list.add(new BasicNameValuePair("tbs", getTbs(BDUSS)));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.LIKE_TIEBA_URL, null, list);
 			String retCode = (String) JsonKit.getInfo("error_code", EntityUtils.toString(response.getEntity()));
 			if(retCode.equals("0")) {
@@ -596,12 +565,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("fid", fid));
 			list.add(new BasicNameValuePair("kw", kw));
 			list.add(new BasicNameValuePair("tbs", getTbs(BDUSS)));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.UNFAVO_TIEBA_URL, null, list);
 			String retCode = (String) JsonKit.getInfo("error_code", EntityUtils.toString(response.getEntity()));
 			if(retCode.equals("0")) {
@@ -655,12 +619,7 @@ public class TieBaApi {
 		list.add(new BasicNameValuePair("is_guest", "0"));
 		list.add(new BasicNameValuePair("page_no", (curpn == null?page:curpn) + ""));
 		list.add(new BasicNameValuePair("uid", uid));
-		String signStr = "";
-		for (NameValuePair nameValuePair : list) {
-			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-		}
-		signStr += "tiebaclient!!!";
-		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 		String tStr =  EntityUtils.toString(hk.execute(Constants.GET_USER_TIEBA, null, list).getEntity());
 		String  hasMore =  JsonKit.getInfo("has_more", tStr).toString();
 		Map<String, Object> j1;
@@ -929,12 +888,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("net_type", "3"));
 			list.add(new BasicNameValuePair("spid", pid));
 			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.FLOR_PID, createCookie(bduss), list);
 			String result = EntityUtils.toString(response.getEntity());
 			String error_code = (String) JsonKit.getInfo("error_code", result);
@@ -979,12 +933,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
 			list.add(new BasicNameValuePair("tid", tid));
 			list.add(new BasicNameValuePair("title", ""));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.REPLY_POST_URL, createCookie(bduss), list);
 			String result = EntityUtils.toString(response.getEntity());
 			String code = (String) JsonKit.getInfo("error_code", result);
@@ -1036,12 +985,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
 			list.add(new BasicNameValuePair("tid", tid));
 			list.add(new BasicNameValuePair("vcode_tag", "11"));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.REPLY_POST_URL, createCookie(bduss), list);
 			String result = EntityUtils.toString(response.getEntity());
 			String code = (String) JsonKit.getInfo("error_code", result);
@@ -1075,12 +1019,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("_phone_imei", "864587027315606"));
 			list.add(new BasicNameValuePair("net_type", "3"));
 			list.add(new BasicNameValuePair("pn", pn + ""));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.TBAT_POST_URL + type+ "me", createCookie(bduss), list);
 			String result = EntityUtils.toString(response.getEntity());
 			return JSON.parseArray(JsonKit.getInfo(type + "_list", result).toString(), ReplyInfo.class);
@@ -1100,14 +1039,8 @@ public class TieBaApi {
 		String title = "";
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair("kz", tid));
-		String signStr = "";
-		for (NameValuePair nameValuePair : list) {
-			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-		}
-		signStr += "tiebaclient!!!";
-		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 		try {
-			
 			HttpResponse response = hk.execute(Constants.F_PAGE, null, list);
 			String result = EntityUtils.toString(response.getEntity());
 			title = ((List<Map<String, Object>>) JsonKit.getInfo("post_list", result)).get(0).get("title").toString();
@@ -1349,12 +1282,7 @@ public class TieBaApi {
 		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
 		list.add(new BasicNameValuePair("pn", pn + ""));
 		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
-		String signStr = "";
-		for (NameValuePair nameValuePair : list) {
-			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-		}
-		signStr += "tiebaclient!!!";
-		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 		try {
 			HttpResponse response = hk.execute(Constants.GET_FOLLOW_LIST, null, list);
 			return EntityUtils.toString(response.getEntity());
@@ -1379,12 +1307,7 @@ public class TieBaApi {
 		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
 		list.add(new BasicNameValuePair("pn", pn + ""));
 		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
-		String signStr = "";
-		for (NameValuePair nameValuePair : list) {
-			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-		}
-		signStr += "tiebaclient!!!";
-		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 		try {
 			HttpResponse response = hk.execute(Constants.GET_FOLLOW_LIST, null, list);
 			String result = EntityUtils.toString(response.getEntity());
@@ -1424,12 +1347,7 @@ public class TieBaApi {
 		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
 		list.add(new BasicNameValuePair("pn", pn + ""));
 		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
-		String signStr = "";
-		for (NameValuePair nameValuePair : list) {
-			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-		}
-		signStr += "tiebaclient!!!";
-		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 		try {
 			HttpResponse response = hk.execute(Constants.GET_FANS_LIST, null, list);
 			return EntityUtils.toString(response.getEntity());
@@ -1454,12 +1372,7 @@ public class TieBaApi {
 		list.add(new BasicNameValuePair("_client_version", "9.8.8.13"));
 		list.add(new BasicNameValuePair("pn", pn + ""));
 		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
-		String signStr = "";
-		for (NameValuePair nameValuePair : list) {
-			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-		}
-		signStr += "tiebaclient!!!";
-		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 		try {
 			HttpResponse response = hk.execute(Constants.GET_FANS_LIST, null, list);
 			String result = EntityUtils.toString(response.getEntity());
@@ -1501,12 +1414,7 @@ public class TieBaApi {
 		list.add(new BasicNameValuePair("fans_uid", fans_uid));
 		list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
 		list.add(new BasicNameValuePair("timestamp", System.currentTimeMillis()+""));
-		String signStr = "";
-		for (NameValuePair nameValuePair : list) {
-			signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-		}
-		signStr += "tiebaclient!!!";
-		list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 		try {
 			HttpResponse response = hk.execute(Constants.REMOVE_FANS, null, list);
 			return EntityUtils.toString(response.getEntity());
@@ -1626,12 +1534,7 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("fid", api.getFid(tbName)));
 			list.add(new BasicNameValuePair("kw", tbName));
 			list.add(new BasicNameValuePair("tbs", api.getTbs(bduss)));
-			String signStr = "";
-			for (NameValuePair nameValuePair : list) {
-				signStr += new Formatter().format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString();
-			}
-			signStr += "tiebaclient!!!";
-			list.add(new BasicNameValuePair("sign", MD5Kit.toMd5(signStr).toUpperCase()));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.LIKE_TIEBA_URL, null, list);
 			String fr = EntityUtils.toString(response.getEntity());
 			Integer isLike = (Integer)JSONPath.eval(JSON.parse(fr), "$.info.is_like");
