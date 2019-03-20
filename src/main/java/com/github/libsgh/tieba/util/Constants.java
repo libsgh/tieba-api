@@ -56,4 +56,6 @@ public class Constants {
 	public static final String ZHIDAO_USER_CENTER = "https://zhidao.baidu.com/usercenter?uid=%s";//知道用户中心，用于查询完整用户名
 	public static final String GET_FORUM_SUPPORT = "http://tieba.baidu.com/celebrity/submit/getForumSupport";//1.名人堂助攻
 	public static final String FORUM_SUPPORT = "http://tieba.baidu.com/celebrity/submit/support";//2。名人堂助攻
+	public static final String LEBO_API = "http://leboapi.baidu.com/leboapi/user?type=getUserDetail";//BDUSS查询用户信息
+	public static final String GET_USER_PROFILE = "http://ce.baidu.com/site/getUserProfile";//BDUSS查询用户名和头像
 }
