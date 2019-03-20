@@ -1,7 +1,10 @@
 package com.github.libsgh.tieba.util;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.http.NameValuePair;
 
 /**
  * 字符串工具类
@@ -113,4 +116,17 @@ public class StrKit {
         }).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
 	}
 	
+	/**
+	 * 贴吧api 参数md5
+	 * @param list
+	 * @return
+	 */
+	public static String md5Sign(List<NameValuePair> list) {
+		StringBuilder sb = new StringBuilder();
+		for (NameValuePair nameValuePair : list) {
+			sb.append(String.format("%s=%s", nameValuePair.getName(),nameValuePair.getValue()).toString());
+		}
+		sb.append("tiebaclient!!!");
+		return MD5Kit.toMd5(sb.toString()).toUpperCase();
+	}
 }
