@@ -118,8 +118,8 @@ public class StrKit {
 	
 	/**
 	 * 贴吧api 参数md5
-	 * @param list
-	 * @return
+	 * @param list 参数列表
+	 * @return 加密字符串
 	 */
 	public static String md5Sign(List<NameValuePair> list) {
 		StringBuilder sb = new StringBuilder();
