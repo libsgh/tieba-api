@@ -43,7 +43,13 @@ public class HttpKit {
 	private CookieStore cookieStore = new BasicCookieStore();
 	
 	private static String Content_Type = "application/x-www-form-urlencoded";
+	
 	private static String User_Agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
+	
+	private static int con_timeout = 2000;
+	
+	private static int so_timeout = 60000;
+
 	private HttpKit(){}
 	
 	public static HttpKit getInstance(){
@@ -71,7 +77,6 @@ public class HttpKit {
 	 * @param cookie cookie
 	 * @param headerMaps headerMaps
 	 * @return HttpResponse
-	 * @throws Exception
 	 * 带header参数的请求
 	 */
 	public HttpResponse execute(String url, String cookie, HashMap<String, Header> headerMaps){
@@ -86,10 +91,9 @@ public class HttpKit {
 	 * @param headerMaps 添加额外header
 	 * @return HttpResponse
 	 * 20170117添加stoken
-	 * @throws Exception 网络请求异常
 	 */
 	public HttpResponse execute(String url, String cookie, List<NameValuePair> params, HashMap<String, Header> headerMaps){
-		RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).setConnectTimeout(2000).setSocketTimeout(60000).build();
+		RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).setConnectTimeout(con_timeout).setSocketTimeout(so_timeout).build();
 		HttpResponse response = null;
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpUriRequest request = null;
@@ -154,7 +158,7 @@ public class HttpKit {
     		httpGet.setHeader("Content-Type", Content_Type);
     		httpGet.setHeader("User-Agent", User_Agent);
     		httpGet.setHeader("Cookie",cookie);
-    		RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).build();
+    		RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).setConnectTimeout(con_timeout).setSocketTimeout(so_timeout).build();
     		httpGet.setConfig(config);
     		response = httpClient.execute(httpGet);
     		int statusCode = response.getStatusLine().getStatusCode();
