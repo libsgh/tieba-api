@@ -57,13 +57,13 @@ public class HttpKit {
 		return bc;
 	}
 	
-	public HttpResponse execute(String url) throws Exception{
+	public HttpResponse execute(String url){
 		return execute(url, null, null, null);
 	}
-	public HttpResponse execute(String url, String cookie) throws Exception{
+	public HttpResponse execute(String url, String cookie){
 		return execute(url, cookie, null, null);
 	}
-	public HttpResponse execute(String url, String cookie, List<NameValuePair> params) throws Exception{
+	public HttpResponse execute(String url, String cookie, List<NameValuePair> params){
 		return execute(url, cookie, params, null);
 	}
 	/**
@@ -74,7 +74,7 @@ public class HttpKit {
 	 * @throws Exception
 	 * 带header参数的请求
 	 */
-	public HttpResponse execute(String url, String cookie, HashMap<String, Header> headerMaps) throws Exception{
+	public HttpResponse execute(String url, String cookie, HashMap<String, Header> headerMaps){
 		return execute(url, cookie, null, headerMaps);
 	}
 	
@@ -88,8 +88,8 @@ public class HttpKit {
 	 * 20170117添加stoken
 	 * @throws Exception 网络请求异常
 	 */
-	public HttpResponse execute(String url, String cookie, List<NameValuePair> params, HashMap<String, Header> headerMaps) throws Exception{
-		RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).build();
+	public HttpResponse execute(String url, String cookie, List<NameValuePair> params, HashMap<String, Header> headerMaps){
+		RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).setConnectTimeout(2000).setSocketTimeout(60000).build();
 		HttpResponse response = null;
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpUriRequest request = null;
