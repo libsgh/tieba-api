@@ -62,3 +62,4 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
 
 基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
 
+QQ交流群：795554410
