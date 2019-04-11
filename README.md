@@ -1,6 +1,6 @@
 # tieba-api
 [![language](https://img.shields.io/badge/language-java-blue.svg)](https://www.java.com)
-[![version](https://img.shields.io/badge/version-v1.0.3-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.3)
+[![version](https://img.shields.io/badge/version-v1.0.4-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.4)
 [![GitHub license](https://img.shields.io/github/license/libsgh/tieba-api.svg)](https://github.com/libsgh/tieba-api/blob/master/LICENSE)
 
 
@@ -57,6 +57,8 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
  api.isFocus("bug", bduss);//是否关注某个贴吧
  api.getFullNameByPanUrl("panUrl");//根据百度盘分享url查询完整用户名（大部分可查）
  api.support(bduss, "柯南");//助攻名人堂
+ api.prisionReasonList(bduss, "home", "uid");//获取封禁原因列表
+ api.commitprison(bduss, "home", "张三", 1 ,"reason");//封禁用户
 ```
 基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
 
