@@ -280,4 +280,21 @@ public class BaiDuApiTest {
 	public void support() {
 		System.out.println(api.support(bduss, "柯南"));
 	}
+	
+	/**
+	 * 获取封禁原因
+	 */
+	@Test
+	public void getPrisionReasionList() {
+		System.out.println(api.prisionReasonList(bduss, "home", "uid"));
+	}
+	
+	/**
+	 * 获取封禁原因
+	 */
+	@Test
+	public void commitprison() {
+		System.out.println(api.commitprison(bduss, "home", "张三", 1 ,"reason"));
+	}
+
 }
