@@ -1663,4 +1663,85 @@ public class TieBaApi {
 		return suportResult;
 	}
 	
+	/**
+	 * 获取封禁原因列表
+	 * @param bduss bduss
+	 * @param tbName 贴吧名称
+	 * @param uid 用户uid
+	 * @return 封禁原因列表
+	 */
+	@SuppressWarnings("unchecked")
+	public List<String> prisionReasonList(String bduss, String tbName, String uid){
+		List<String> reasonList = null;
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("BDUSS", bduss));
+			list.add(new BasicNameValuePair("_client_id", "wappc_1451451147094_870"));
+			list.add(new BasicNameValuePair("_client_type", "2"));
+			list.add(new BasicNameValuePair("_client_version", "6.2.2"));
+			list.add(new BasicNameValuePair("_phone_imei", "864587027315606"));
+			list.add(new BasicNameValuePair("forum_id", getFid(tbName)));
+			list.add(new BasicNameValuePair("user_id", uid));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
+			HttpResponse response = hk.execute(Constants.BAWU_POST_URL, createCookie(bduss), list);
+			String result = EntityUtils.toString(response.getEntity());
+			String code = (String) JsonKit.getInfo("error_code", result);
+			if("0".equals(code)){
+				reasonList = (List<String>) JsonKit.getInfo("reason", result);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return reasonList;
+	}
+	
+	/**
+	 * 封禁用户
+	 * @param bduss bduss
+	 * @param userName 要封禁的用户名
+	 * @param tbName 贴吧名称
+	 * @param days 封禁天数（一般是1,3,10 10是上限）
+	 * @param reason 封禁原因 {@link TieBaApi#prisionReasonList}
+	 * @return 封禁的结果
+	 */
+	public String commitprison(String bduss, String userName, String tbName, Integer days, String reason){
+		return commitprison(bduss, this.getTbs(bduss), userName, tbName, days, reason);
+	}
+	
+	/**
+	 * 封禁用户
+	 * @param bduss bduss
+	 * @param tbs tbs
+	 * @param userName 要封禁的用户名
+	 * @param tbName 贴吧名称
+	 * @param days 封禁天数（一般是1,3,10 10是上限）
+	 * @param reason 封禁原因 {@link TieBaApi#prisionReasonList}
+	 * @return 封禁的结果
+	 */
+	public String commitprison(String bduss, String tbs, String userName, String tbName, Integer days, String reason){
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("BDUSS", bduss));
+			list.add(new BasicNameValuePair("_client_id", "wappc_1451451147094_870"));
+			list.add(new BasicNameValuePair("_client_type", "2"));
+			list.add(new BasicNameValuePair("_client_version", "6.2.2"));
+			list.add(new BasicNameValuePair("_phone_imei", "864587027315606"));
+			list.add(new BasicNameValuePair("day", days+""));
+			list.add(new BasicNameValuePair("fid", getFid(tbName)));
+			list.add(new BasicNameValuePair("ntn", "banid"));
+			list.add(new BasicNameValuePair("reason", reason));
+			list.add(new BasicNameValuePair("tbs", tbs));
+			list.add(new BasicNameValuePair("un", userName));//封禁的用户名称
+			list.add(new BasicNameValuePair("word", tbName));//贴吧名称
+			list.add(new BasicNameValuePair("z", "1234"));//帖子id,这里随便写
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
+			HttpResponse response = hk.execute(Constants.PRISION_POST_URL, createCookie(bduss), list);
+			String result = EntityUtils.toString(response.getEntity());
+			return result;
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
+	
 }
