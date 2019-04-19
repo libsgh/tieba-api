@@ -1,6 +1,6 @@
 # tieba-api
 [![language](https://img.shields.io/badge/language-java-blue.svg)](https://www.java.com)
-[![version](https://img.shields.io/badge/version-v1.0.4-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.4)
+[![version](https://img.shields.io/badge/version-v1.0.5-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.5)
 [![GitHub license](https://img.shields.io/github/license/libsgh/tieba-api.svg)](https://github.com/libsgh/tieba-api/blob/master/LICENSE)
 
 
@@ -59,9 +59,12 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
  api.support(bduss, "柯南");//助攻名人堂
  api.prisionReasonList(bduss, "home", "uid");//获取封禁原因列表
  api.commitprison(bduss, "home", "张三", 1 ,"reason");//封禁用户
+ api.focus2(bduss, stoken, api.getFid("bug"));//关注贴吧（网页接口，可以关注异常吧）
+ api.unfocus2(bduss, stoken, api.getFid("bug"));//取关贴吧（网页接口，可以取关异常吧）
+ api.getFid("bug");//获取贴吧fid
 ```
-基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
+仅演示及工具：基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
 
-基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
+使用推荐：基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
 
 QQ交流群：795554410
