@@ -42,8 +42,10 @@ public class Constants {
 	public static final String TIEBA_URL_HTTP = "http://tieba.baidu.com/f?kw=%s&ie=utf-8";//某个贴吧url
 	public static final String SEARCH_FRIEND = "http://c.tieba.baidu.com/c/r/friend/searchFriend";//获取用户信息
 	public static final String GET_USER_TIEBA = "http://c.tieba.baidu.com/c/f/forum/like";//获取用户关注的贴吧
-	public static final String LIKE_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/like";//关注一个贴吧
-	public static final String UNFAVO_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/unfavo";//取消关注一个贴吧
+	public static final String LIKE_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/like";//关注一个贴吧（客户端接口）
+	public static final String UNFAVO_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/unfavo";//取消关注一个贴吧(客户端接口)
+	public static final String ADD_TIEBA = "https://tieba.baidu.com/f/like/commit/add";//关注一个贴吧（网页接口）
+	public static final String DELETE_TIEBA = "https://tieba.baidu.com/f/like/commit/delete";//取消关注一个贴吧（网页接口）
 	public static final String TIEBA_FID = "http://tieba.baidu.com/f/commit/share/fnameShareApi?ie=utf-8&fname=";//获取贴吧fid
 	public static final String FLOR_PID = "http://c.tieba.baidu.com/c/f/pb/floor";//获取楼层pid
 	public static final String GET_QRCODE_SIGN = "https://passport.baidu.com/v2/api/getqrcode";//获取登录二维码sign
