@@ -3,18 +3,19 @@ package com.tieba.test;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.libsgh.tieba.api.TieBaApi;
 import com.github.libsgh.tieba.model.ReplyInfo;
 
 public class BaiDuApiTest {
 	
-	private Logger logger =LogManager.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static String bduss = "";
 	private static String stoken = "";
@@ -24,7 +25,7 @@ public class BaiDuApiTest {
     public static void runOnceBeforeClass() {
         bduss = "";
         stoken = "";
-        username = "数学書";
+        username = "除氺";
         api = TieBaApi.getInstance();
     }
     
@@ -80,7 +81,7 @@ public class BaiDuApiTest {
 	
 	@Test
 	public void tbs() {
-		System.out.println(api.getTbs(bduss));
+		logger.info(api.getTbs(bduss));
 	}
 	/**
 	 * 获取我喜欢的贴吧
@@ -184,6 +185,14 @@ public class BaiDuApiTest {
 	}
 	
 	/**
+	 * 关注一个贴吧
+	 */
+	@Test
+	public void focus2() {
+		logger.info(""+api.focus2(bduss, stoken, api.getFid("bug")));
+	}
+	
+	/**
 	 * 取消关注一个贴吧
 	 */
 	@Test
@@ -192,11 +201,19 @@ public class BaiDuApiTest {
 	}
 	
 	/**
+	 * 取消关注一个贴吧
+	 */
+	@Test
+	public void unfocus2() {
+		logger.info(""+api.unfocus2(bduss, stoken, api.getFid("bug")));
+	}
+	
+	/**
 	 * 获取登录二维码
 	 */
 	@Test
 	public void getQRCodeUrl() {
-		System.out.println(api.getQRCodeUrl());
+		logger.info(JSON.toJSONString(api.getQRCodeUrl()));
 	}
 	
 	/**
@@ -204,7 +221,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getFollowPage() {
-		System.out.println(api.getFollowPage(bduss, 4).toString());
+		logger.info(api.getFollowPage(bduss, 4).toString());
 	}
 	
 	/**
@@ -212,7 +229,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getFollowList() {
-		System.out.println(api.getFollowList(bduss).toString());
+		logger.info(api.getFollowList(bduss).toString());
 	}
 	
 	/**
@@ -220,7 +237,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getFansPage() {
-		System.out.println(api.getFansList(bduss).toString());
+		logger.info(api.getFansList(bduss).toString());
 	}
 	
 	/**
@@ -228,7 +245,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void removeFans() {
-		System.out.println(api.removeFans(bduss,"fans_uid").toString());
+		logger.info(api.removeFans(bduss,"fans_uid").toString());
 	}
 	
 	/**
@@ -236,8 +253,8 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void isLogin() {
-		System.out.println(api.islogin(bduss, stoken));
-		System.out.println(api.islogin(bduss));
+		logger.info(""+api.islogin(bduss, stoken));
+		logger.info(""+api.islogin(bduss));
 	}
 	
 	/**
@@ -245,7 +262,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getCookieFromQRCode() {
-		System.out.println(api.getCookieFromQRCode("v"));
+		logger.info(JSON.toJSONString(api.getCookieFromQRCode("v")));
 	}
 	
 	/**
@@ -253,7 +270,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void jubao() {
-		System.out.println(api.jubao(bduss, "123649521597","10004",""));
+		logger.info(api.jubao(bduss, "123649521597","10004",""));
 	}
 	
 	/**
@@ -261,8 +278,8 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void isFocus() {
-		System.out.println(api.isFocus("bug", bduss, stoken));
-		System.out.println(api.isFocus("bug", bduss));
+		logger.info(""+api.isFocus("bug", bduss, stoken));
+		logger.info(""+api.isFocus("bug", bduss));
 	}
 	
 	/**
@@ -270,7 +287,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getFullNameByPanUrl() {
-		System.out.println(api.getFullNameByPanUrl("https://pan.baidu.com/wap/init?surl=NGAyTDnx2JNAw9Lj5-oD5w"));
+		logger.info(api.getFullNameByPanUrl("https://pan.baidu.com/wap/init?surl=NGAyTDnx2JNAw9Lj5-oD5w"));
 	}
 	
 	/**
@@ -278,7 +295,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void support() {
-		System.out.println(api.support(bduss, "柯南"));
+		logger.info(api.support(bduss, "柯南"));
 	}
 	
 	/**
@@ -286,15 +303,15 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getPrisionReasionList() {
-		System.out.println(api.prisionReasonList(bduss, "home", "uid"));
+		logger.info(api.prisionReasonList(bduss, "home", "uid").toString());
 	}
 	
 	/**
-	 * 获取封禁原因
+	 * 封禁
 	 */
 	@Test
 	public void commitprison() {
-		System.out.println(api.commitprison(bduss, "home", "张三", 1 ,"reason"));
+		logger.info(api.commitprison(bduss, "home", "张三", 1 ,"reason"));
 	}
 
 }
