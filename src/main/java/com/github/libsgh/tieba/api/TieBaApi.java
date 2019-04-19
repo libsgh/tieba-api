@@ -24,12 +24,12 @@ import org.apache.http.ParseException;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONPath;
@@ -54,7 +54,7 @@ import cn.hutool.crypto.asymmetric.KeyType;
  */
 public class TieBaApi {
 	
-	private Logger logger = LogManager.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public  static volatile TieBaApi api;
 	
@@ -314,6 +314,9 @@ public class TieBaApi {
 			
 			HttpResponse response = hk.execute(Constants.SIGN_POST_URL, createCookie(bduss), list);
 	        String result = EntityUtils.toString(response.getEntity());
+	        if(logger.isDebugEnabled()) {
+	        	logger.debug(result);
+	        }
 	        String code = (String) JsonKit.getInfo("error_code", result);
 	        String msg = (String) JsonKit.getInfo("error_msg", result);
 	        Map<String, String> map = (Map<String, String>) JsonKit.getInfo("user_info", result);
@@ -418,13 +421,16 @@ public class TieBaApi {
 			}
 			//2.根据uid获取用户信息
 			List<NameValuePair> list = new ArrayList<NameValuePair>();
-		   list.add(new BasicNameValuePair("_client_version", "6.1.2"));//显示徽章必填项
-		   list.add(new BasicNameValuePair("has_plist", "2"));//1可以显示回帖信息
-		   list.add(new BasicNameValuePair("need_post_count", "1"));//查看回帖发帖数量必填
-		   list.add(new BasicNameValuePair("uid", uid));//用户的uid  必填
+			list.add(new BasicNameValuePair("_client_version", "6.1.2"));//显示徽章必填项
+			list.add(new BasicNameValuePair("has_plist", "2"));//1可以显示回帖信息
+			list.add(new BasicNameValuePair("need_post_count", "1"));//查看回帖发帖数量必填
+			list.add(new BasicNameValuePair("uid", uid));//用户的uid  必填
 			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.USER_PROFILE, null, list);
 			result = EntityUtils.toString(response.getEntity());
+			if(logger.isDebugEnabled()) {
+	        	logger.debug(result);
+	        }
 		} catch (ParseException e) {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
@@ -542,6 +548,61 @@ public class TieBaApi {
 	}
 	
 	/**
+	 * 关注一个贴吧(网页接口)
+	 * @param BDUSS BDUSS
+	 * @param STOKEN STOKEN
+	 * @param fid fid
+	 * @return 返回结果
+	 */
+	public Boolean focus2(String BDUSS, String STOKEN, String fid) {
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("fid", fid));
+			list.add(new BasicNameValuePair("tbs", getTbs(BDUSS)));
+			HttpResponse response = hk.execute(Constants.ADD_TIEBA, createCookie(BDUSS, STOKEN), list);
+			String result = EntityUtils.toString(response.getEntity());
+			if (logger.isDebugEnabled()) {
+				logger.debug("fid:{},result:{}", fid, result);
+			}
+			Integer retCode = (Integer) JsonKit.getInfo("no", result);
+			if(retCode == 0 || retCode == 221) {
+				//已关注或是关注成功
+				return Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return Boolean.FALSE;
+	}
+	
+	/**
+	 * 取关一个贴吧(网页接口)
+	 * @param BDUSS BDUSS
+	 * @param STOKEN STOKEN
+	 * @param fid fid
+	 * @return 返回结果
+	 */
+	public Boolean unfocus2(String BDUSS, String STOKEN, String fid) {
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("fid", fid));
+			list.add(new BasicNameValuePair("tbs", getTbs(BDUSS)));
+			HttpResponse response = hk.execute(Constants.DELETE_TIEBA, createCookie(BDUSS, STOKEN), list);
+			String result = EntityUtils.toString(response.getEntity());
+			if (logger.isDebugEnabled()) {
+				logger.debug("fid:{},result:{}", fid, result);
+			}
+			Integer retCode = (Integer) JsonKit.getInfo("no", result);
+			if(retCode == 0) {
+				return Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return Boolean.FALSE;
+	}
+	
+	/**
 	 * 关注一个贴吧
 	 * @param BDUSS BDUSS
 	 * @param kw 贴吧名称
@@ -601,6 +662,21 @@ public class TieBaApi {
 	}
 	
 	/**
+	 * 获取用户隐藏贴吧
+	 * @param uid 用户uid
+	 * @return result
+	 */
+	public List<Map<String, Object>> getHideTbsByUid(String uid) {
+		List<Map<String, Object>> tiebas = new ArrayList<Map<String, Object>>();
+		try {
+			this.getTbsByUid(uid, tiebas, 1, null);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return tiebas;
+	}
+	
+	/**
 	 * 递归获取关注贴吧数
 	 * @param uid
 	 * @param tiebas
@@ -611,7 +687,7 @@ public class TieBaApi {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	private void getTbsByUid(String uid, List<Map<String, Object>> tiebas, int page, Integer curpn) throws ParseException, IOException, Exception {
+	public void getTbsByUid(String uid, List<Map<String, Object>> tiebas, int page, Integer curpn) throws ParseException, IOException, Exception {
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair("_client_version", "6.2.2"));
@@ -664,6 +740,9 @@ public class TieBaApi {
 		try {
 			HttpResponse response = hk.execute(Constants.USER_INFO_GET_URL, createCookie(bduss, stoken));
 			String result = EntityUtils.toString(response.getEntity());
+			if(logger.isDebugEnabled()) {
+	        	logger.debug(result);
+	        }
             if("0".equals(JsonKit.getInfo("no", result).toString())){
             	return (Map<String, Object>) JsonKit.getInfo("data", result);
             }
@@ -936,6 +1015,9 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.REPLY_POST_URL, createCookie(bduss), list);
 			String result = EntityUtils.toString(response.getEntity());
+			if(logger.isDebugEnabled()) {
+	        	logger.debug(result);
+	        }
 			String code = (String) JsonKit.getInfo("error_code", result);
 			msg = (String) JsonKit.getInfo("msg", result);
 			if("0".equals(code)){//回帖成功
@@ -988,6 +1070,9 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.REPLY_POST_URL, createCookie(bduss), list);
 			String result = EntityUtils.toString(response.getEntity());
+			if(logger.isDebugEnabled()) {
+	        	logger.debug(result);
+	        }
 			String code = (String) JsonKit.getInfo("error_code", result);
 			msg = (String) JsonKit.getInfo("msg", result);
 			if("0".equals(code)){//回帖成功
@@ -1022,6 +1107,9 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 			HttpResponse response = hk.execute(Constants.TBAT_POST_URL + type+ "me", createCookie(bduss), list);
 			String result = EntityUtils.toString(response.getEntity());
+			if(logger.isDebugEnabled()) {
+	        	logger.debug(result);
+	        }
 			return JSON.parseArray(JsonKit.getInfo(type + "_list", result).toString(), ReplyInfo.class);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
