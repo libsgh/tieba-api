@@ -93,7 +93,7 @@ public class HttpKit {
 	 * 20170117添加stoken
 	 */
 	public HttpResponse execute(String url, String cookie, List<NameValuePair> params, HashMap<String, Header> headerMaps){
-		RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).setConnectTimeout(con_timeout).setSocketTimeout(so_timeout).build();
+		RequestConfig config = RequestConfig.custom().setConnectTimeout(con_timeout).setSocketTimeout(so_timeout).build();
 		HttpResponse response = null;
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpUriRequest request = null;
@@ -101,6 +101,7 @@ public class HttpKit {
 			if (params != null) {
 				HttpPost httpPost = new HttpPost(url);
 				HttpEntity postBodyEnt = new UrlEncodedFormEntity(params, "utf-8");
+				httpPost.setConfig(config);
 				httpPost.setEntity(postBodyEnt);
 				request = httpPost;
 			} else {
