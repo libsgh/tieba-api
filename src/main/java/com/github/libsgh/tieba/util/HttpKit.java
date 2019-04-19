@@ -24,8 +24,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class HttpKit {
 	
-	private Logger logger =LogManager.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
     private volatile static HttpKit bc;
     
