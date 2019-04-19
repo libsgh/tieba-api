@@ -678,16 +678,13 @@ public class TieBaApi {
 	
 	/**
 	 * 递归获取关注贴吧数
-	 * @param uid
-	 * @param tiebas
-	 * @param page
-	 * @param curpn
-	 * @throws ParseException
-	 * @throws IOException
-	 * @throws Exception
+	 * @param uid uid
+	 * @param tiebas 贴吧列表
+	 * @param page page
+	 * @param curpn curpn
 	 */
 	@SuppressWarnings("unchecked")
-	public void getTbsByUid(String uid, List<Map<String, Object>> tiebas, int page, Integer curpn) throws ParseException, IOException, Exception {
+	public void getTbsByUid(String uid, List<Map<String, Object>> tiebas, int page, Integer curpn) {
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair("_client_version", "6.2.2"));
@@ -696,7 +693,12 @@ public class TieBaApi {
 		list.add(new BasicNameValuePair("page_no", (curpn == null?page:curpn) + ""));
 		list.add(new BasicNameValuePair("uid", uid));
 		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
-		String tStr =  EntityUtils.toString(hk.execute(Constants.GET_USER_TIEBA, null, list).getEntity());
+		String tStr = "";
+		try {
+			tStr = EntityUtils.toString(hk.execute(Constants.GET_USER_TIEBA, null, list).getEntity());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
 		String  hasMore =  JsonKit.getInfo("has_more", tStr).toString();
 		Map<String, Object> j1;
 		j1 = (Map<String, Object>) JsonKit.getInfo("forum_list", tStr);
