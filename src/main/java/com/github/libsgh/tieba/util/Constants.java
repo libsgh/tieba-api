@@ -60,4 +60,6 @@ public class Constants {
 	public static final String FORUM_SUPPORT = "http://tieba.baidu.com/celebrity/submit/support";//2。名人堂助攻
 	public static final String LEBO_API = "http://leboapi.baidu.com/leboapi/user?type=getUserDetail";//BDUSS查询用户信息
 	public static final String GET_USER_PROFILE = "http://ce.baidu.com/site/getUserProfile";//BDUSS查询用户名和头像
+	public static final String SIGN_DEL = "http://tieba.baidu.com/f/user/cm/sign_del";//删除签名档
+	public static final String SIGN_QUERY = "http://tieba.baidu.com/f/user/sign";//获取签名档
 }
