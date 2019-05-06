@@ -379,27 +379,15 @@ public class TieBaApi {
 	 * 获取用户隐藏贴吧
 	 * @param username 用户名
 	 * @param curpn 页码
-	 * @return result
+	 * @return result 贴吧列表
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Map<String, Object>> getHideTbs(String username, Integer curpn) {
-		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		List<Map<String, Object>> tiebas = new ArrayList<Map<String, Object>>();
-		try {
-			list.add(new BasicNameValuePair("search_key", username));
-			list.add(new BasicNameValuePair("_client_version", "6.2.2"));
-			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
-			HttpResponse response = hk.execute(Constants.SEARCH_FRIEND, null, list);
-			String result = EntityUtils.toString(response.getEntity());
-			if(!JsonKit.getInfo("errorno", result).toString().equals("0")) {
-				logger.info("用户信息查找失败");
-			}else {
-				String userId = ((List<Map<String, Object>>) JsonKit.getInfo("user_info", result)).get(0).get("user_id").toString();
-				this.getTbsByUid(userId, tiebas, 1, curpn);
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return tiebas;
+		String uid = this.getUidByUname(username);
+		if(StrUtil.isNotBlank(uid)) {
+			this.getTbsByUid(uid, tiebas, 1, curpn);
+		}else {
+			logger.info("用户信息查找失败");
 		}
 		return tiebas;
 	}
@@ -413,28 +401,23 @@ public class TieBaApi {
 		String result = "";
 		try {
 			//1.根据名称获取uid
-			HttpResponse response0 = hk.execute(Constants.NEW_HEAD_URL + name, null);
-			String tieba_user = EntityUtils.toString(response0.getEntity());
-			String uid = StrKit.substring(tieba_user, "\"home_user_id\" : ", ",");
-			if(StrKit.isBlank(uid)){
-				return null;
+			String uid = this.getUidByUname(name);
+			if(StrUtil.isNotBlank(uid)) {
+				//2.根据uid获取用户信息
+				List<NameValuePair> list = new ArrayList<NameValuePair>();
+				list.add(new BasicNameValuePair("_client_version", "6.1.2"));//显示徽章必填项
+				list.add(new BasicNameValuePair("has_plist", "2"));//1可以显示回帖信息
+				list.add(new BasicNameValuePair("need_post_count", "1"));//查看回帖发帖数量必填
+				list.add(new BasicNameValuePair("uid", uid));//用户的uid  必填
+				list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
+				HttpResponse response = hk.execute(Constants.USER_PROFILE, null, list);
+				result = EntityUtils.toString(response.getEntity());
+				if(logger.isDebugEnabled()) {
+					logger.debug(result);
+				}
+			}else {
+				logger.info("用户信息查找失败");
 			}
-			//2.根据uid获取用户信息
-			List<NameValuePair> list = new ArrayList<NameValuePair>();
-			list.add(new BasicNameValuePair("_client_version", "6.1.2"));//显示徽章必填项
-			list.add(new BasicNameValuePair("has_plist", "2"));//1可以显示回帖信息
-			list.add(new BasicNameValuePair("need_post_count", "1"));//查看回帖发帖数量必填
-			list.add(new BasicNameValuePair("uid", uid));//用户的uid  必填
-			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
-			HttpResponse response = hk.execute(Constants.USER_PROFILE, null, list);
-			result = EntityUtils.toString(response.getEntity());
-			if(logger.isDebugEnabled()) {
-	        	logger.debug(result);
-	        }
-		} catch (ParseException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -703,10 +686,18 @@ public class TieBaApi {
 		Map<String, Object> j1;
 		j1 = (Map<String, Object>) JsonKit.getInfo("forum_list", tStr);
 		List<Map<String, Object>> lj3 = (List<Map<String, Object>>) j1.get("non-gconforum");
+		lj3 = lj3.stream().map(r->{
+			r.put("type", "non-gconforum");
+			return r;
+		}).collect(Collectors.toList());
 		if(lj3 != null) {
 			tiebas.addAll(lj3);
 		}
 		List<Map<String, Object>> lj4 = (List<Map<String, Object>>) j1.get("gconforum");
+		lj4 = lj4.stream().map(r->{
+			r.put("type", "gconforum");
+			return r;
+		}).collect(Collectors.toList());
 		if(lj4 != null) {
 			tiebas.addAll(lj4);
 		}
@@ -1828,6 +1819,31 @@ public class TieBaApi {
 			HttpResponse response = hk.execute(Constants.PRISION_POST_URL, createCookie(bduss), list);
 			String result = EntityUtils.toString(response.getEntity());
 			return result;
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
+	
+	/**
+	 * 根据uname获取uid
+	 * @param uname uname
+	 * @return uid
+	 */
+	@SuppressWarnings("unchecked")
+	public String getUidByUname(String uname) {
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("search_key", uname));
+			list.add(new BasicNameValuePair("_client_version", "6.2.2"));
+			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
+			HttpResponse response = HttpKit.getInstance().execute(Constants.SEARCH_FRIEND, null, list);
+			String result = EntityUtils.toString(response.getEntity());
+			if(!JsonKit.getInfo("errorno", result).toString().equals("0")) {
+				logger.info("用户信息查找失败");
+			}else {
+				return ((List<Map<String, Object>>) JsonKit.getInfo("user_info", result)).get(0).get("user_id").toString();
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
