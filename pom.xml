@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.libsgh</groupId>
 	<artifactId>tieba-api</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 	<name>tieba-api</name>
 	<url>https://github.com/libsgh</url>
 	<description>封装了贴吧操作的部分api</description>
@@ -30,7 +30,7 @@
 		<log4j.version>2.11.2</log4j.version>
 		<sl4j.version>1.7.26</sl4j.version>
 		<junit.version>4.12</junit.version>
-		<hutool.version>4.5.6</hutool.version>
+		<hutool.version>4.5.9</hutool.version>
 	</properties>
 	<dependencies>
 		<dependency>
