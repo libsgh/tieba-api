@@ -683,28 +683,34 @@ public class TieBaApi {
 			logger.error(e.getMessage(), e);
 		}
 		String  hasMore =  JsonKit.getInfo("has_more", tStr).toString();
-		Map<String, Object> j1;
-		j1 = (Map<String, Object>) JsonKit.getInfo("forum_list", tStr);
-		List<Map<String, Object>> lj3 = (List<Map<String, Object>>) j1.get("non-gconforum");
-		lj3 = lj3.stream().map(r->{
-			r.put("type", "non-gconforum");
-			return r;
-		}).collect(Collectors.toList());
-		if(lj3 != null) {
-			tiebas.addAll(lj3);
-		}
-		List<Map<String, Object>> lj4 = (List<Map<String, Object>>) j1.get("gconforum");
-		lj4 = lj4.stream().map(r->{
-			r.put("type", "gconforum");
-			return r;
-		}).collect(Collectors.toList());
-		if(lj4 != null) {
-			tiebas.addAll(lj4);
-		}
-		if(curpn == null) {
-			if(hasMore.equals("1")) {
-				page++;
-				this.getTbsByUid(uid, tiebas, page, curpn);
+		Map<String, Object> j1 = new HashMap<String, Object>();
+		if (!(JsonKit.getInfo("forum_list", tStr) instanceof com.alibaba.fastjson.JSONArray)) {
+			j1 = (Map<String, Object>) JsonKit.getInfo("forum_list", tStr);
+			List<Map<String, Object>> lj3 = (List<Map<String, Object>>) j1.get("non-gconforum");
+			if(lj3 != null) {
+				lj3 = lj3.stream().map(r->{
+					r.put("type", "non-gconforum");
+					return r;
+				}).collect(Collectors.toList());
+			}
+			if(lj3 != null) {
+				tiebas.addAll(lj3);
+			}
+			List<Map<String, Object>> lj4 = (List<Map<String, Object>>) j1.get("gconforum");
+			if(lj4!=null) {
+				lj4 = lj4.stream().map(r->{
+					r.put("type", "gconforum");
+					return r;
+				}).collect(Collectors.toList());
+			}
+			if(lj4 != null) {
+				tiebas.addAll(lj4);
+			}
+			if(curpn == null) {
+				if(hasMore.equals("1")) {
+					page++;
+					this.getTbsByUid(uid, tiebas, page, curpn);
+				}
 			}
 		}
 	}
