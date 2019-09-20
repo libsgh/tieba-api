@@ -136,6 +136,9 @@ public class HttpKit {
 	        		response = httpClient.execute(reHttpGet);
 	        		return response;
 	            }
+			} else if(statusCode == HttpStatus.SC_MOVED_PERMANENTLY){//301重定向
+				Header h = response.getFirstHeader("Location");
+				return execute(h.getValue(), cookie, params, headerMaps);
 			}
 		} catch (Exception e) {
 			logger.error("http请求异常", e);

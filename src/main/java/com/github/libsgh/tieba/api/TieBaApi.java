@@ -610,8 +610,9 @@ public class TieBaApi {
 			list.add(new BasicNameValuePair("kw", kw));
 			list.add(new BasicNameValuePair("tbs", getTbs(BDUSS)));
 			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
-			HttpResponse response = hk.execute(Constants.UNFAVO_TIEBA_URL, null, list);
-			String retCode = (String) JsonKit.getInfo("error_code", EntityUtils.toString(response.getEntity()));
+			HttpResponse response = hk.execute(Constants.UNFAVO_TIEBA_URL_NEW, null, list);
+			String result = EntityUtils.toString(response.getEntity());
+			String retCode = (String) JsonKit.getInfo("error_code", result);
 			if(retCode.equals("0")) {
 				return Boolean.TRUE;
 			}

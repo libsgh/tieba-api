@@ -44,6 +44,7 @@ public class Constants {
 	public static final String GET_USER_TIEBA = "http://c.tieba.baidu.com/c/f/forum/like";//获取用户关注的贴吧
 	public static final String LIKE_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/like";//关注一个贴吧（客户端接口）
 	public static final String UNFAVO_TIEBA_URL = "http://c.tieba.baidu.com/c/c/forum/unfavo";//取消关注一个贴吧(客户端接口)
+	public static final String UNFAVO_TIEBA_URL_NEW = "http://c.tieba.baidu.com/c/c/forum/unfavolike";//取消关注一个贴吧(新客户端接口)
 	public static final String ADD_TIEBA = "https://tieba.baidu.com/f/like/commit/add";//关注一个贴吧（网页接口）
 	public static final String DELETE_TIEBA = "https://tieba.baidu.com/f/like/commit/delete";//取消关注一个贴吧（网页接口）
 	public static final String TIEBA_FID = "http://tieba.baidu.com/f/commit/share/fnameShareApi?ie=utf-8&fname=";//获取贴吧fid

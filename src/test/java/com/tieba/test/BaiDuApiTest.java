@@ -34,7 +34,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void reply() {
-		logger.info(api.reply(bduss, "5635882244", "bug", "#bug吧#回帖接口测试", 0).toString());
+		logger.info(api.reply(bduss, "6263231235", "重庆力帆", "路过", 0).toString());
 	}
 	
 	/**
@@ -42,8 +42,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getIndexTList() {
-		logger.info(api.getIndexTList("bug",1).toString());
-		
+		logger.info(api.getIndexTList("重庆力帆").toString());
 	}
 	
 	/**
@@ -311,7 +310,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void commitprison() {
-		logger.info(api.commitprison(bduss, "home", "张三", 1 ,"reason"));
+		logger.info(api.commitprison(bduss, "", "快乐女声", 1 ,"reason"));
 	}
 
 }
