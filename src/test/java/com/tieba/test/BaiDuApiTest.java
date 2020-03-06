@@ -19,7 +19,7 @@ public class BaiDuApiTest {
 	
 	private static String bduss = "";
 	private static String stoken = "";
-	private static String username = "";
+	private static String username = "除氺";
 	private static TieBaApi api = null;
     @BeforeClass
     public static void runOnceBeforeClass() {
@@ -34,7 +34,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void reply() {
-		logger.info(api.reply(bduss, "6263231235", "重庆力帆", "路过", 0).toString());
+		logger.info(api.reply(bduss, "帖子id", "贴吧名称", "回复内容", 0).toString());
 	}
 	
 	/**
@@ -42,11 +42,11 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getIndexTList() {
-		logger.info(api.getIndexTList("重庆力帆").toString());
+		logger.info(api.getIndexTList("贴吧名称").toString());
 	}
 	
 	/**
-	 * 执行签到
+	 * 一键签到某id关注所有吧
 	 */
 	@Test
 	public void oneBtnToSign() {
@@ -57,7 +57,7 @@ public class BaiDuApiTest {
 	}
 	
 	/**
-	 * 执行签到
+	 * 签到一个贴吧
 	 */
 	@Test
 	public void signDo() {
@@ -68,26 +68,31 @@ public class BaiDuApiTest {
 	}
 	
 	/**
-	 * 获取用户所有的贴吧（贴吧数多会稍慢）
+	 * 获取隐藏贴吧（接口失效）
 	 */
 	@Test
 	public void getHideTbs() {
+		@SuppressWarnings("deprecation")
 		List<Map<String, Object>> list = api.getHideTbs(username);
 		String result = JSONObject.toJSONString(list);
 		logger.info(result);
 		
 	}
 	
+	/**
+	 * 获取用户所有的贴吧（贴吧数多会稍慢）
+	 */
+	@Test
+	public void getLikedTb() {
+		List<Map<String, Object>> list = api.getLikedTb(bduss);
+		String result = JSONObject.toJSONString(list);
+		logger.info(result);
+		logger.info(JSONObject.toJSONString(api.getMyLikedTB(bduss, stoken)));
+	}
+	
 	@Test
 	public void tbs() {
 		logger.info(api.getTbs(bduss));
-	}
-	/**
-	 * 获取我喜欢的贴吧
-	 */
-	@Test
-	public void getMyLikedTB() {
-		logger.info(JSONObject.toJSONString(api.getMyLikedTB(bduss, stoken)));
 	}
 	
 	/**
@@ -246,7 +251,6 @@ public class BaiDuApiTest {
 	public void removeFans() {
 		logger.info(api.removeFans(bduss,"fans_uid").toString());
 	}
-	
 	/**
 	 * 检查登录有效性
 	 */
@@ -254,6 +258,7 @@ public class BaiDuApiTest {
 	public void isLogin() {
 		logger.info(""+api.islogin(bduss, stoken));
 		logger.info(""+api.islogin(bduss));
+		logger.info(api.getLikedTb(bduss).toString());
 	}
 	
 	/**
@@ -261,7 +266,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getCookieFromQRCode() {
-		logger.info(JSON.toJSONString(api.getCookieFromQRCode("v")));
+		logger.info(JSON.toJSONString(api.getCookieFromQRCode("750a9c55b12923ae95fb8b5868091019")));
 	}
 	
 	/**
@@ -277,8 +282,8 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void isFocus() {
-		logger.info(""+api.isFocus("bug", bduss, stoken));
-		logger.info(""+api.isFocus("bug", bduss));
+		logger.info(api.isFocus("bug", bduss, stoken).toString());
+		logger.info(api.isFocus("bug", bduss).toString());
 	}
 	
 	/**
@@ -287,6 +292,7 @@ public class BaiDuApiTest {
 	@Test
 	public void getFullNameByPanUrl() {
 		logger.info(api.getFullNameByPanUrl("https://pan.baidu.com/wap/init?surl=NGAyTDnx2JNAw9Lj5-oD5w"));
+		logger.info(api.getFullNameByPanUrl("https://pan.baidu.com/share/init?surl=q8evrcvjgyHX9h5wHNd8aw"));
 	}
 	
 	/**
@@ -310,7 +316,39 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void commitprison() {
-		logger.info(api.commitprison(bduss, "", "快乐女声", 1 ,"reason"));
+		logger.info(api.commitprison(bduss, "除氺", "吧名", 1 , "reason"));
+		logger.info(api.commitprison(bduss, "除氺", "吧名", 1 , "reason", "portrait"));
+		//当一个吧务封禁多个id时，建议获取一次tbs
+		logger.info(api.commitprison(bduss, "除氺", "tbs", "吧名", 1 , "reason","portrait"));
 	}
-
+	
+	/**
+	 * 扫码登录，流程简单示例
+	 */
+	@Test
+	public void sweepCode() {
+		//1. 获取二维码图片地址，sign，gid
+		//{"codeUrl":"https://passport.baidu.com/v2/api/qrcode?sign=xxx&uaonly=&client_id=&lp=pc&client=&traceid=","gid":"","sign":"","time":"1583485744993"}
+		Map<String, Object> map = api.getQRCodeUrl();
+		logger.info(map.toString());
+		//2. 检测扫码登录状态，传递步骤一中的参数sign，gid
+		//{"errno":1}  未扫码
+		//{"errno":0,"channel_v":"{\"status\":1}"}}  已经扫码，未'确认登录'
+		//{"errno":0,"channel_v":"{\"status\":0,\"v\":\"750a9c55b12923ae95fb8b5868091019\",\"u\":null}"} 确认登录，返回v
+		JSONObject jo = api.qrCodeLoginStatus(map.get("sign").toString(), map.get("gid").toString());
+		logger.info(jo.toJSONString());
+		//3.根据步骤2返回的参数v获取贴吧cookie，bduss和stoken
+		//{"stoken":"","bduss":""}
+		Map<String, Object> cookieMap = api.getCookieFromQRCode("v");
+		logger.info(cookieMap.toString());
+	}
+	/**
+	 * 检测扫码登录状态
+	 */
+	@Test
+	public void qrCodeLoginStatus() {
+		JSONObject jo = api.qrCodeLoginStatus("sign", "gid");
+		logger.info(jo.toJSONString());
+	}
+	
 }
