@@ -63,4 +63,6 @@ public class Constants {
 	public static final String GET_USER_PROFILE = "http://ce.baidu.com/site/getUserProfile";//BDUSS查询用户名和头像
 	public static final String SIGN_DEL = "http://tieba.baidu.com/f/user/cm/sign_del";//删除签名档
 	public static final String SIGN_QUERY = "http://tieba.baidu.com/f/user/sign";//获取签名档
+	public static final String UK_UN = "https://pan.baidu.com/pcloud/user/getinfo?query_uk=%s";//根据uk查询un
+	public static final String QRCODE_LOGIN_STATUS = "https://passport.baidu.com/channel/unicast?channel_id=%s&tpl=mn&gid=%s&apiver=v3&tt=%s&callback=tangram_guid";//根据uk查询un
 }
