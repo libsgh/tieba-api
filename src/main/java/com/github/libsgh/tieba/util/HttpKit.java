@@ -3,6 +3,7 @@ package com.github.libsgh.tieba.util;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -26,6 +27,14 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.http.HttpRequest;
 
 
 
@@ -228,5 +237,31 @@ public class HttpKit {
 
 	public void setCookieStore(CookieStore cookieStore) {
 		this.cookieStore = cookieStore;
+	}
+	
+	/**
+	 * 贴吧接口公共请求方法（带签名）
+	 * @param url 请求地址
+	 * @param params 请求参数
+	 * @return
+	 */
+	public static JSONObject commonRequest(String url, Map<String, Object> paramMap) {
+		HttpRequest request = HttpRequest.post(url);
+		for (String key : paramMap.keySet()) {
+			request.form(key, paramMap.get(key));
+		}
+		Map<String, Object> formMap = request.form();
+		formMap = MapUtil.sort(formMap);
+		StringBuilder sb = new StringBuilder();
+		for (String key : formMap.keySet()) {
+			sb.append(String.format("%s=%s", key, formMap.get(key)).toString());
+		}
+		sb.append("tiebaclient!!!");
+		String sign = SecureUtil.md5(sb.toString()).toUpperCase();
+		String body = request.form("sign", sign).execute().body();
+		if(StrUtil.isNotBlank(body)) {
+			return JSON.parseObject(body);
+		}
+		return null;
 	}
 }
