@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.github.libsgh.tieba.model.ClientType;
 import com.github.libsgh.tieba.model.MyTB;
@@ -46,6 +47,7 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.http.HttpUtil;
 
 /**
  * 贴吧api
@@ -385,7 +387,7 @@ public class TieBaApi {
 		List<Map<String, Object>> tiebas = new ArrayList<Map<String, Object>>();
 		String uid = this.getUidByUname(username);
 		if(StrUtil.isNotBlank(uid)) {
-			this.getTbsByUid(uid, tiebas, 1, curpn);
+			this.getTbsByUid(uid, tiebas, 1, curpn, "");
 		}else {
 			logger.info("用户信息查找失败");
 		}
@@ -641,6 +643,7 @@ public class TieBaApi {
 	 * @param username 用户名
 	 * @return result
 	 */
+	@Deprecated
 	public List<Map<String, Object>> getHideTbs(String username) {
 		return this.getHideTbs(username, null);
 	}
@@ -653,7 +656,7 @@ public class TieBaApi {
 	public List<Map<String, Object>> getHideTbsByUid(String uid) {
 		List<Map<String, Object>> tiebas = new ArrayList<Map<String, Object>>();
 		try {
-			this.getTbsByUid(uid, tiebas, 1, null);
+			this.getTbsByUid(uid, tiebas, 1, null, "");
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -668,7 +671,7 @@ public class TieBaApi {
 	 * @param curpn curpn
 	 */
 	@SuppressWarnings("unchecked")
-	public void getTbsByUid(String uid, List<Map<String, Object>> tiebas, int page, Integer curpn) {
+	public void getTbsByUid(String uid, List<Map<String, Object>> tiebas, int page, Integer curpn, String bduss) {
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair("_client_version", "6.2.2"));
@@ -679,7 +682,8 @@ public class TieBaApi {
 		list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
 		String tStr = "";
 		try {
-			tStr = EntityUtils.toString(hk.execute(Constants.GET_USER_TIEBA, null, list).getEntity());
+			tStr = EntityUtils.toString(hk.execute(Constants.GET_USER_TIEBA, createCookie(bduss), list).getEntity());
+			System.out.println(tStr);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -710,7 +714,7 @@ public class TieBaApi {
 			if(curpn == null) {
 				if(hasMore.equals("1")) {
 					page++;
-					this.getTbsByUid(uid, tiebas, page, curpn);
+					this.getTbsByUid(uid, tiebas, page, curpn, bduss);
 				}
 			}
 		}
@@ -1232,7 +1236,7 @@ public class TieBaApi {
 			String result = EntityUtils.toString(response.getEntity());
 			String sign = JsonKit.getPInfo("sign", result).toString();
 			if(sign != null) {
-				 map.put("codeUrl", new Formatter().format(Constants.GET_QRCODE_IMG,sign).toString());
+				 map.put("codeUrl", String.format(Constants.GET_QRCODE_IMG, sign).toString());
 				 map.put("gid", gid);
 				 map.put("sign", sign);
 				 map.put("time", time+"");
@@ -1646,11 +1650,13 @@ public class TieBaApi {
 	 */
 	public String getFullNameByPanUrl(String panUrl) {
 		try {
+			panUrl = StrUtil.replace(panUrl, "wap", "share");
 			String html = EntityUtils.toString(hk.execute(panUrl).getEntity());
-			String portrait = StrKit.substring(html, "item/", ".");
-			String bb =  EntityUtils.toString(hk.execute(String.format(Constants.ZHIDAO_USER_CENTER, portrait)).getEntity());
-			String uname = Jsoup.parse(bb).select(".name-wp span").text();
-			return uname;
+			String uk = StrKit.substring(html, "uk\":", ",");
+			String json = HttpUtil.get(String.format(Constants.UK_UN, uk));
+			JSONObject jsonObject = JSON.parseObject(json);
+			String un = JSONPath.eval(jsonObject, "$.user_info.uname").toString();
+			return un;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -1683,7 +1689,7 @@ public class TieBaApi {
 		Long start = System.currentTimeMillis();
 		Map<String, Object> msg = new HashMap<String, Object>();
 		//1.先获取用户关注的贴吧
-		List<Map<String, Object>> list = getHideTbs(getUserName(bduss));
+		List<Map<String, Object>> list = getLikedTb(bduss);
 		String tbs = this.getTbs(bduss);
 		int totalCount = list.size();
 		//2.一键签到
@@ -1793,39 +1799,56 @@ public class TieBaApi {
 	 * @return 封禁的结果
 	 */
 	public String commitprison(String bduss, String userName, String tbName, Integer days, String reason){
-		return commitprison(bduss, this.getTbs(bduss), userName, tbName, days, reason);
+		return commitprison(bduss, this.getTbs(bduss), userName, tbName, days, reason, null);
+	}
+	
+	/**
+	 * 封禁用户
+	 * @param bduss bduss
+	 * @param userName 要封禁的用户名
+	 * @param tbName 贴吧名称
+	 * @param days 封禁天数（一般是1,3,10 10是上限）
+	 * @param reason 封禁原因 {@link TieBaApi#prisionReasonList}
+	 * @param portrait portrait
+	 * @return 封禁的结果
+	 */
+	public String commitprison(String bduss, String userName, String tbName, Integer days, String reason, String portrait){
+		return commitprison(bduss, this.getTbs(bduss), userName, tbName, days, reason, portrait);
 	}
 	
 	/**
 	 * 封禁用户
 	 * @param bduss bduss
 	 * @param tbs tbs
-	 * @param userName 要封禁的用户名
+	 * @param userName 要封禁的用户名或是覆盖名（没有用户名的时候）
 	 * @param tbName 贴吧名称
 	 * @param days 封禁天数（一般是1,3,10 10是上限）
 	 * @param reason 封禁原因 {@link TieBaApi#prisionReasonList}
 	 * @return 封禁的结果
 	 */
-	public String commitprison(String bduss, String tbs, String userName, String tbName, Integer days, String reason){
+	public String commitprison(String bduss, String tbs, String userName, String tbName, Integer days, String reason, String portrait){
 		try {
-			List<NameValuePair> list = new ArrayList<NameValuePair>();
-			list.add(new BasicNameValuePair("BDUSS", bduss));
-			list.add(new BasicNameValuePair("_client_id", "wappc_1451451147094_870"));
-			list.add(new BasicNameValuePair("_client_type", "2"));
-			list.add(new BasicNameValuePair("_client_version", "6.2.2"));
-			list.add(new BasicNameValuePair("_phone_imei", "864587027315606"));
-			list.add(new BasicNameValuePair("day", days+""));
-			list.add(new BasicNameValuePair("fid", getFid(tbName)));
-			list.add(new BasicNameValuePair("ntn", "banid"));
-			list.add(new BasicNameValuePair("reason", reason));
-			list.add(new BasicNameValuePair("tbs", tbs));
-			list.add(new BasicNameValuePair("un", userName));//封禁的用户名称
-			list.add(new BasicNameValuePair("word", tbName));//贴吧名称
-			list.add(new BasicNameValuePair("z", "1234"));//帖子id,这里随便写
-			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
-			HttpResponse response = hk.execute(Constants.PRISION_POST_URL, createCookie(bduss), list);
-			String result = EntityUtils.toString(response.getEntity());
-			return result;
+			Map<String, Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("BDUSS", bduss);
+			paramMap.put("_client_type", 2);
+			paramMap.put("_client_version", "11.2.8.1");
+			paramMap.put("day", days);
+			paramMap.put("fid", getFid(tbName));
+			paramMap.put("ntn", "banid");
+			if(StrUtil.isNotBlank(portrait)) {
+				paramMap.put("portrait", portrait);
+				paramMap.put("nick_name", userName);
+				paramMap.put("un", "");
+			}else {
+				paramMap.put("un", userName);
+			}
+			paramMap.put("reason", "大量散布广告，发表交易帖，屡教不改，给予封禁处罚。");
+			paramMap.put("tbs", tbs);
+			paramMap.put("timestamp", System.currentTimeMillis());
+			paramMap.put("word", tbName);
+			paramMap.put("z", "1234");
+			JSONObject result = HttpKit.commonRequest(Constants.PRISION_POST_URL, paramMap);
+			return result.toJSONString();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -1855,6 +1878,30 @@ public class TieBaApi {
 			logger.error(e.getMessage(), e);
 		}
 		return "";
+	}
+	
+	/**
+	 * 根据BDUSS获取关注吧
+	 * @param bduss bduss
+	 * @return 返回关注贴吧
+	 */
+	public List<Map<String, Object>> getLikedTb(String bduss) {
+		List<Map<String, Object>> tiebas = new ArrayList<Map<String, Object>>();
+		this.getTbsByUid(this.getUidByUname(this.getUserName(bduss)), tiebas, 1, null, bduss);
+		return tiebas;
+	}
+	
+	/**
+	 * 扫码登录状态查询（获取参数v）
+	 * @param sign sign {@link TieBaApi#getQRCodeUrl()}
+	 * @param gid gid {@link TieBaApi#getQRCodeUrl()}
+	 * @return 返回状态结果
+	 */
+	public JSONObject qrCodeLoginStatus(String sign, String gid) {
+		String body = HttpUtil.get(String.format(Constants.QRCODE_LOGIN_STATUS, sign, gid, System.currentTimeMillis()));
+		body = StrUtil.subBetween(body, "(", ")");
+		JSONObject jo = JSON.parseObject(body);
+		return jo;
 	}
 	
 }
