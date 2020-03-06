@@ -62,9 +62,10 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
  api.focus2(bduss, stoken, api.getFid("bug"));//关注贴吧（网页接口，可以关注异常吧）
  api.unfocus2(bduss, stoken, api.getFid("bug"));//取关贴吧（网页接口，可以取关异常吧）
  api.getFid("bug");//获取贴吧fid
+ api.qrCodeLoginStatus("sign", "gid");//检查扫码登录状态查询
 ```
 仅演示及工具：基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
 
 使用推荐：基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
 
-有问题提issue或QQ联系：359916450
+有问题提issue或q：359916450
