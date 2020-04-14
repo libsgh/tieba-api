@@ -683,7 +683,7 @@ public class TieBaApi {
 		String tStr = "";
 		try {
 			tStr = EntityUtils.toString(hk.execute(Constants.GET_USER_TIEBA, createCookie(bduss), list).getEntity());
-			System.out.println(tStr);
+			logger.debug(tStr);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
