@@ -53,7 +53,7 @@ public class HttpKit {
 	
 	private static String Content_Type = "application/x-www-form-urlencoded";
 	
-	private static String User_Agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
+	public static String User_Agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36";
 	
 	private static int con_timeout = 2000;
 	

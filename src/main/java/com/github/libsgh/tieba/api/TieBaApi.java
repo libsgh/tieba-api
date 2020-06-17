@@ -1,5 +1,6 @@
 package com.github.libsgh.tieba.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
@@ -17,10 +18,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
+import com.github.libsgh.tieba.model.*;
+import org.apache.http.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -34,9 +39,6 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
-import com.github.libsgh.tieba.model.ClientType;
-import com.github.libsgh.tieba.model.MyTB;
-import com.github.libsgh.tieba.model.ReplyInfo;
 import com.github.libsgh.tieba.util.Constants;
 import com.github.libsgh.tieba.util.HttpKit;
 import com.github.libsgh.tieba.util.JsonKit;
@@ -1903,5 +1905,47 @@ public class TieBaApi {
 		JSONObject jo = JSON.parseObject(body);
 		return jo;
 	}
-	
+
+	/**
+	 * 获取传图用的 imgtbs
+	 * 和 tbs 一样，不用每次传图都获取
+	 * @return imgtbs
+	 */
+	public String getImgTbs() {
+		try {
+			HttpResponse response = HttpKit.getInstance().execute(Constants.IMGTBS_URL);
+			String result = EntityUtils.toString(response.getEntity());
+			Map<String, Object> data = (Map<String, Object>) JsonKit.getInfo("data", result);
+			return (String) data.get("tbs");
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
+	 * 传图
+	 * @param photo 		上传的图片
+	 * @param bduss			BDUSS
+	 * @param imgTbs		{@link #getImgTbs}
+	 * @param fid			贴吧id {@link #getFid}
+	 * @param saveYunAlbum	是否保存到百度云相册
+	 * @param watermarkType	水印类型
+	 * @return 图片网络地址
+	 */
+	public JSONObject uploadPhoto(File photo, String bduss, String imgTbs, String fid, boolean saveYunAlbum, WatermarkType watermarkType) {
+		HttpPost httpPost = new HttpPost(String.format(Constants.UPLOAD_PHOTOS, imgTbs, fid, saveYunAlbum ? 1 : 0, watermarkType.getCode()));
+		httpPost.setEntity(MultipartEntityBuilder.create().addPart("file", new FileBody(photo)).build());
+//		httpPost.setHeader("Content-Type", "multipart/form-data");
+		httpPost.setHeader("Cookie", createCookie(bduss));
+		httpPost.setHeader("User-Agent", HttpKit.User_Agent);
+		try (CloseableHttpClient client = HttpClients.createDefault();
+			 CloseableHttpResponse response = client.execute(httpPost)) {
+			String result = EntityUtils.toString(response.getEntity());
+			return JSON.parseObject(result);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
+	}
 }

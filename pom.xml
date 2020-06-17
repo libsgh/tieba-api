@@ -24,6 +24,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<httpclient.version>4.5.5</httpclient.version>
+		<httpmime.version>4.5.5</httpmime.version>
 		<httpcore.version>4.4.9</httpcore.version>
 		<jsoup.version>1.13.1</jsoup.version>
 		<fastjson.version>1.2.66</fastjson.version>
@@ -42,6 +43,11 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>${httpclient.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>${httpmime.version}</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.jsoup</groupId>

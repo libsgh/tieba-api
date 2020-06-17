@@ -1,8 +1,10 @@
 package com.tieba.test;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import com.github.libsgh.tieba.model.WatermarkType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -350,5 +352,28 @@ public class BaiDuApiTest {
 		JSONObject jo = api.qrCodeLoginStatus("sign", "gid");
 		logger.info(jo.toJSONString());
 	}
-	
+
+	/**
+	 * 获取传图 imgtbs
+	 */
+	@Test
+	public void getImgTbs() {
+		String imgTbs = api.getImgTbs();
+		logger.info(imgTbs);
+	}
+
+	/**
+	 * 上传图片
+	 */
+	@Test
+	public void uploadPhoto() {
+		JSONObject info = api.uploadPhoto(
+				new File(""),
+				bduss,
+				api.getImgTbs(),
+				api.getFid(""),
+				true,
+				WatermarkType.DECADE_WATERMARK);
+		logger.info(info.toString());
+	}
 }

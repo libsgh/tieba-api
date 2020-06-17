@@ -13,6 +13,7 @@ public class Constants {
 	public static final String PUB_KEY_URL = "https://passport.baidu.com/v2/getpublickey?token=%s&tpl=tb&apiver=v3&tt=%s&gid=&loginversion=v4&traceid=";//获取RSA公钥
 	public static final String TIEBA_GET_URL = "https://tieba.baidu.com";//贴吧地址
 	public static final String TBS_URL = "http://tieba.baidu.com/dc/common/tbs";//tbs 获取随机参数（好多请求用到）
+	public static final String IMGTBS_URL = "https://tieba.baidu.com/dc/common/imgtbs"; //获取传图 tbs
 	public static final String USER_INFO_GET_URL = "http://tieba.baidu.com/f/user/json_userinfo";//获取用户json信息
 	public static final String WENKU_SIGN_URL = "https://wenku.baidu.com/task/submit/signin";
 	
@@ -65,4 +66,5 @@ public class Constants {
 	public static final String SIGN_QUERY = "http://tieba.baidu.com/f/user/sign";//获取签名档
 	public static final String UK_UN = "https://pan.baidu.com/pcloud/user/getinfo?query_uk=%s";//根据uk查询un
 	public static final String QRCODE_LOGIN_STATUS = "https://passport.baidu.com/channel/unicast?channel_id=%s&tpl=mn&gid=%s&apiver=v3&tt=%s&callback=tangram_guid";//根据uk查询un
+	public static final String UPLOAD_PHOTOS = "https://uploadphotos.baidu.com/upload/pic?tbs=%s&fid=%s&save_yun_album=%s&picWaterType=%s";//传图 url
 }
