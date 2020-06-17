@@ -1936,7 +1936,6 @@ public class TieBaApi {
 	public JSONObject uploadPhoto(File photo, String bduss, String imgTbs, String fid, boolean saveYunAlbum, WatermarkType watermarkType) {
 		HttpPost httpPost = new HttpPost(String.format(Constants.UPLOAD_PHOTOS, imgTbs, fid, saveYunAlbum ? 1 : 0, watermarkType.getCode()));
 		httpPost.setEntity(MultipartEntityBuilder.create().addPart("file", new FileBody(photo)).build());
-//		httpPost.setHeader("Content-Type", "multipart/form-data");
 		httpPost.setHeader("Cookie", createCookie(bduss));
 		httpPost.setHeader("User-Agent", HttpKit.User_Agent);
 		try (CloseableHttpClient client = HttpClients.createDefault();
