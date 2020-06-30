@@ -1842,7 +1842,7 @@ public class TieBaApi {
 			}else {
 				paramMap.put("un", userName);
 			}
-			paramMap.put("reason", "大量散布广告，发表交易帖，屡教不改，给予封禁处罚。");
+			paramMap.put("reason", reason);
 			paramMap.put("tbs", tbs);
 			paramMap.put("timestamp", System.currentTimeMillis());
 			paramMap.put("word", tbName);
