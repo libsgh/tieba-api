@@ -25,6 +25,7 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
 直接引用jar,在[tieba-api](http://mvnrepository.com/artifact/com.github.libsgh/tieba-api/)或[releases](https://github.com/libsgh/tieba-api/releases)下载最新版
 ```
  TieBaApi api = TieBaApi.getInstance();
+ api.uploadPicture(new File(""), bduss, api.getImgTbs(), "fid", false, WatermarkType.NO_WATERMARK);//上传图片，返回图片id（用于回帖）
  api.reply(bduss, "5635882244", "bug", "#bug吧#回帖接口测试", 0);//回帖
  api.getIndexTList("bug",1);//获取首页帖子数组
  api.oneBtnToSign(bduss, stoken);//一键签到
@@ -63,6 +64,7 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
  api.unfocus2(bduss, stoken, api.getFid("bug"));//取关贴吧（网页接口，可以取关异常吧）
  api.getFid("bug");//获取贴吧fid
  api.qrCodeLoginStatus("sign", "gid");//检查扫码登录状态查询
+ api.addThread(bduss, "tbName", "", "c");//上传图片
 ```
 
 使用推荐：基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
