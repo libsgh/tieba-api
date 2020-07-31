@@ -64,7 +64,6 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
  api.getFid("bug");//获取贴吧fid
  api.qrCodeLoginStatus("sign", "gid");//检查扫码登录状态查询
 ```
-～～仅演示及工具：基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)～～
 
 使用推荐：基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
 
