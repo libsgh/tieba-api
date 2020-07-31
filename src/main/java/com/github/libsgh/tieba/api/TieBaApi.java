@@ -1,5 +1,6 @@
 package com.github.libsgh.tieba.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
@@ -37,6 +38,7 @@ import com.alibaba.fastjson.JSONPath;
 import com.github.libsgh.tieba.model.ClientType;
 import com.github.libsgh.tieba.model.MyTB;
 import com.github.libsgh.tieba.model.ReplyInfo;
+import com.github.libsgh.tieba.model.WatermarkType;
 import com.github.libsgh.tieba.util.Constants;
 import com.github.libsgh.tieba.util.HttpKit;
 import com.github.libsgh.tieba.util.JsonKit;
@@ -983,9 +985,9 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 回帖
+	 * 回帖-客户端
 	 * @param bduss bduss
-	 * @param tbs (应该避免频繁获取，因为tbs获取可能会失败){@link TieBaApi#getTbs}
+	 * @param tbs (应该避免频繁获取，因为tbs获取可能会失败){@link #getTbs}
 	 * @param tid 帖子id
 	 * @param fid 贴吧的fid
 	 * @param tbName 贴吧名字
@@ -1011,7 +1013,7 @@ public class TieBaApi {
 					.form("BDUSS", bduss).form("_client_type", clientType)
 					.form("_client_version", "9.7.8.0").form("_phone_imei", "000000000000000")
 					.form("anonymous", "1").form("content", content)
-					.form("fid", TieBaApi.getInstance().getFid("bug")).form("from", "1008621x")
+					.form("fid", fid).form("from", "1008621x")
 					.form("is_ad", "0").form("kw", tbName).form("model", "MI+5")
 					.form("net_type", "1").form("new_vcode", "1")
 					.form("tbs", tbs).form("tid", tid)
@@ -1033,7 +1035,7 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 回帖（tbs、fid调用接口获取）
+	 * 回帖-客户端（tbs、fid调用接口获取）
 	 * @param bduss bduss
 	 * @param tid 帖子id
 	 * @param tbName 贴吧名字
@@ -1046,7 +1048,7 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 回帖（随机客户端）
+	 * 回帖-客户端（随机客户端）
 	 * @param bduss bduss
 	 * @param tid 帖子id
 	 * @param tbName 贴吧名字
@@ -1058,9 +1060,9 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 楼中楼回复
+	 * 楼中楼回复-客户端
 	 * @param bduss bduss
-	 * @param tbs (应该避免频繁获取，因为tbs获取可能会失败){@link TieBaApi#getTbs}
+	 * @param tbs (应该避免频繁获取，因为tbs获取可能会失败){@link #getTbs}
 	 * @param tid 帖子id
 	 * @param pid 楼层id
 	 * @param fid 贴吧fid
@@ -1111,7 +1113,7 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 楼中楼回复（随机客户端）
+	 * 楼中楼回复-客户端（随机客户端）
 	 * @param bduss bduss
 	 * @param tid 帖子id
 	 * @param pid 楼层id
@@ -1124,7 +1126,7 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 楼中楼回复（tbs、fid调用接口获取）
+	 * 楼中楼回复-客户端（tbs、fid调用接口获取）
 	 * @param bduss bduss
 	 * @param tid 帖子id
 	 * @param pid 楼层id
@@ -1925,6 +1927,120 @@ public class TieBaApi {
 		body = StrUtil.subBetween(body, "(", ")");
 		JSONObject jo = JSON.parseObject(body);
 		return jo;
+	}
+	
+	/**
+	 * 获取传图用的 imgtbs
+	 * 和 tbs 一样，不用每次传图都获取
+	 * @return imgtbs
+	 */
+	public String getImgTbs() {
+		try {
+			HttpResponse response = HttpKit.getInstance().execute(Constants.IMGTBS_URL);
+			String result = EntityUtils.toString(response.getEntity());
+			JSONObject jsonobject = JSON.parseObject(result);
+			return jsonobject.getJSONObject("data").getString("tbs");
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
+	 * 上传图片
+	 * @param photo 		上传的图片File
+	 * @param bduss			BDUSS
+	 * @param imgTbs		{@link #getImgTbs}
+	 * @param fid			贴吧id {@link #getFid}
+	 * @param saveYunAlbum	是否保存到百度云相册
+	 * @param watermarkType	水印类型 {@link WatermarkType}
+	 * @return 上传图片结果,img_content用于回帖
+	 */
+	public JSONObject uploadPicture(File photo, String bduss, String imgTbs, String fid, boolean saveYunAlbum, WatermarkType watermarkType) {
+		String url = String.format(Constants.UPLOAD_PHOTOS, imgTbs, fid, saveYunAlbum ? 1 : 0, watermarkType.getCode());
+		String result = HttpRequest.post(url).cookie(createCookie(bduss)).form("file", photo).execute().body();
+		JSONObject jsonobject = JSON.parseObject(result);
+		Integer errorCode = jsonobject.getInteger("error_code");
+		if(errorCode == 0) {
+			//上传成功
+			String picId = jsonobject.getJSONObject("info").getString("pic_id");
+			String width = jsonobject.getJSONObject("info").getString("fullpic_width");
+			String height = jsonobject.getJSONObject("info").getString("fullpic_height");
+			jsonobject.put("img_content", String.format("#(pic,%s,%s,%s)", picId, width, height));
+		}
+		return jsonobject;
+	}
+	
+	/**
+	 * 发帖-客户端
+	 * @param bduss bduss
+	 * @param tbs tbs(不需要每次都获取)
+	 * @param fid 贴吧id {@link #getFid}
+	 * @param tbName 贴吧名字
+	 * @param title 标题，如果没有标题请设置""
+	 * @param content 发帖内容
+	 * @param clientType {@link ClientType}，0为随机
+	 * @return 发帖结果，判断error_code是不是0
+	 */
+	public JSONObject addThread(String bduss, String tbs, String fid, String tbName, String title, String content, int clientType) {
+		if(clientType == 0){//随机选择一种方式
+			ClientType[] arr = ClientType.values();
+			Random random= new Random();
+			int  num = random.nextInt(arr.length);
+			clientType = arr[num].getCode();
+		}
+		HttpRequest request = HttpRequest.post(Constants.THREAD_ADD_URL)
+										.header("Content-Type", "application/x-www-form-urlencoded")
+										.header("User-Agent", "bdtb for Android 9.7.8.0")
+										.form("BDUSS", bduss).form("_client_type", clientType)
+										.form("_client_version", "9.7.8.0").form("_phone_imei", "000000000000000")
+										.form("anonymous", "1").form("call_from", "2")
+										.form("can_no_forum", "0").form("content", content)
+										.form("entrance_type", "1").form("fid", "10733075")
+										.form("from", "1001128p").form("is_feedback", "0")
+										.form("is_hide", "1").form("is_link_thread","0")
+										.form("st_type","notitle").form("is_ntitle", StrUtil.isBlank(title)?1:0)
+										.form("kw", tbName).form("net_type", "1")
+										.form("new_vcode", "1").form("reply_uid","null")
+										.form("takephoto_num", "0").form("tbs", tbs)
+										.form("timestamp", System.currentTimeMillis())
+										.form("stErrorNums", "0").form("title", title).form("vcode_tag", "12");
+		Map<String, Object> formMap = request.form();
+		formMap = MapUtil.sort(formMap);
+		StringBuilder sb = new StringBuilder();
+		for (String key : formMap.keySet()) {
+			sb.append(String.format("%s=%s", key, formMap.get(key)).toString());
+		}
+		sb.append("tiebaclient!!!");
+		String sign = SecureUtil.md5(sb.toString()).toUpperCase();
+		String result = request.form("sign", sign).execute().body();
+		return JSON.parseObject(result);
+	}
+	
+	/**
+	 * 发帖-客户端（随机）
+	 * @param bduss bduss
+	 * @param tbs tbs(不需要每次都获取)
+	 * @param fid 贴吧id {@link #getFid}
+	 * @param tbName 贴吧名字
+	 * @param title 标题，如果没有标题请设置""
+	 * @param content 发帖内容
+	 * @return 发帖结果，判断error_code是不是0
+	 */
+	public JSONObject addThread(String bduss, String tbs, String fid, String tbName, String title, String content) {
+		return addThread(bduss, tbs, fid, tbName, title, content, 0);
+	}
+	
+	/**
+	 * 发帖-客户端
+	 * @param bduss bduss
+	 * @param tbName 贴吧名字
+	 * @param title 标题，如果没有标题请设置""
+	 * @param content 发帖内容
+	 * @return 发帖结果，判断error_code是不是0
+	 */
+	public JSONObject addThread(String bduss, String tbName, String title, String content) {
+		return addThread(bduss, this.getTbs(bduss), this.getFid(tbName), tbName, title, content, 0);
 	}
 	
 }

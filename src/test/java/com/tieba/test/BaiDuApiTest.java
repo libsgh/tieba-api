@@ -1,5 +1,6 @@
 package com.tieba.test;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.libsgh.tieba.api.TieBaApi;
 import com.github.libsgh.tieba.model.ReplyInfo;
+import com.github.libsgh.tieba.model.WatermarkType;
 
 public class BaiDuApiTest {
 	
@@ -34,7 +36,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void reply() {
-		logger.info(api.reply(bduss, "帖子id", "贴吧名称", "回复内容", 0).toString());
+		logger.info(api.reply(bduss, "tid", "tbName", "", 0).toString());
 	}
 	
 	/**
@@ -332,6 +334,7 @@ public class BaiDuApiTest {
 		Map<String, Object> cookieMap = api.getCookieFromQRCode("v");
 		logger.info(cookieMap.toString());
 	}
+	
 	/**
 	 * 检测扫码登录状态
 	 */
@@ -339,6 +342,23 @@ public class BaiDuApiTest {
 	public void qrCodeLoginStatus() {
 		JSONObject jo = api.qrCodeLoginStatus("sign", "gid");
 		logger.info(jo.toJSONString());
+	}
+	
+	/**
+	 * 回帖-上传图片
+	 */
+	@Test
+	public void uploadPicture() {
+		JSONObject jo = api.uploadPicture(new File(""), bduss, api.getImgTbs(), "fid", false, WatermarkType.NO_WATERMARK);
+		logger.info(jo.toJSONString());
+	}
+	
+	/**
+	 * 回帖-上传图片
+	 */
+	@Test
+	public void addThread() {
+		logger.info(api.addThread(bduss, "tbName", "", "c").toJSONString());
 	}
 	
 }
