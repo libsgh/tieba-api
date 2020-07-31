@@ -1,6 +1,6 @@
 # tieba-api
 [![language](https://img.shields.io/badge/language-java-blue.svg)](https://www.java.com)
-[![version](https://img.shields.io/badge/version-v1.0.7-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.7)
+[![version](https://img.shields.io/badge/version-v1.0.9-orange.svg)](https://mvnrepository.com/artifact/com.github.libsgh/tieba-api/1.0.9)
 [![GitHub license](https://img.shields.io/github/license/libsgh/tieba-api.svg)](https://github.com/libsgh/tieba-api/blob/master/LICENSE)
 
 
@@ -37,7 +37,7 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
  api.zhiDaoSign(bduss);//知道签到
  api.wenKuSign(bduss);//文库签到
  api.getMsg(bduss, "reply", 1);//查看回复我或艾特我的信息
- api.replyFloor(bduss, "tid", "fname", "···", 0 , "pid");//楼中楼回复
+ api.replyFloor(bduss, "tid", "pid", "fname", "···", 0);//楼中楼回复
  List<ReplyInfo> list = api.getMsg(bduss, "reply", 1);
  for (ReplyInfo replyInfo : list) {
 	api.floorpid(bduss, replyInfo.getThread_id(), replyInfo.getPost_id());//获取楼层pid
@@ -55,7 +55,7 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
  api.jubao(bduss, "123649521597","10004");//举报帖子
  api.isFocus("bug", bduss, stoken);//是否关注某个贴吧
  api.isFocus("bug", bduss);//是否关注某个贴吧
- api.getFullNameByPanUrl("panUrl");//根据百度盘分享url查询完整用户名（大部分可查）
+ //api.getFullNameByPanUrl("panUrl");//接口失效
  api.support(bduss, "柯南");//助攻名人堂
  api.prisionReasonList(bduss, "home", "uid");//获取封禁原因列表
  api.commitprison(bduss, "home", "张三", 1 ,"reason");//封禁用户
@@ -64,7 +64,7 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
  api.getFid("bug");//获取贴吧fid
  api.qrCodeLoginStatus("sign", "gid");//检查扫码登录状态查询
 ```
-仅演示及工具：基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)
+～～仅演示及工具：基于api实现的贴吧签到系统 [贴吧签到云](https://tieba-tool.herokuapp.com)～～
 
 使用推荐：基于api实现的微信公众号：ponbous，[web站点](http://noki.tk/tieba)
 
