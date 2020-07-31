@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.libsgh</groupId>
 	<artifactId>tieba-api</artifactId>
-	<version>1.0.8</version>
+	<version>1.0.9</version>
 	<name>tieba-api</name>
 	<url>https://github.com/libsgh</url>
 	<description>封装了贴吧操作的部分api</description>
