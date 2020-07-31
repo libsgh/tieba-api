@@ -42,7 +42,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getIndexTList() {
-		logger.info(api.getIndexTList("贴吧名称").toString());
+		logger.info(api.getIndexTList("bug").toString());
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void signDo() {
-		Map<String, Object> map = api.signOneTieBa("姜敏京", 282280, bduss);
+		Map<String, Object> map = api.signOneTieBa("tbName", Integer.parseInt(api.getFid("tbName")), bduss);
 		String result = JSONObject.toJSONString(map);
 		logger.info(result);
 		
@@ -141,7 +141,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void replyFloor() {
-		logger.info(api.replyFloor(bduss, "tid", "fname", "···", 0 , "pid").toString());
+		logger.info(api.replyFloor(bduss, "tid", "pid", "fname", "···", 0).toString());
 	}
 	
 	/**
@@ -258,7 +258,6 @@ public class BaiDuApiTest {
 	public void isLogin() {
 		logger.info(""+api.islogin(bduss, stoken));
 		logger.info(""+api.islogin(bduss));
-		logger.info(api.getLikedTb(bduss).toString());
 	}
 	
 	/**
@@ -266,7 +265,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void getCookieFromQRCode() {
-		logger.info(JSON.toJSONString(api.getCookieFromQRCode("750a9c55b12923ae95fb8b5868091019")));
+		logger.info(JSON.toJSONString(api.getCookieFromQRCode("v")));
 	}
 	
 	/**
@@ -274,7 +273,7 @@ public class BaiDuApiTest {
 	 */
 	@Test
 	public void jubao() {
-		logger.info(api.jubao(bduss, "123649521597","10004",""));
+		logger.info(api.jubao(bduss, "pid","10004",""));
 	}
 	
 	/**
@@ -284,15 +283,6 @@ public class BaiDuApiTest {
 	public void isFocus() {
 		logger.info(api.isFocus("bug", bduss, stoken).toString());
 		logger.info(api.isFocus("bug", bduss).toString());
-	}
-	
-	/**
-	 * 根据百度盘分享链接获取完整用户名
-	 */
-	@Test
-	public void getFullNameByPanUrl() {
-		logger.info(api.getFullNameByPanUrl("https://pan.baidu.com/wap/init?surl=NGAyTDnx2JNAw9Lj5-oD5w"));
-		logger.info(api.getFullNameByPanUrl("https://pan.baidu.com/share/init?surl=q8evrcvjgyHX9h5wHNd8aw"));
 	}
 	
 	/**

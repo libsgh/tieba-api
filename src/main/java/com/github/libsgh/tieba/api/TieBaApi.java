@@ -43,10 +43,12 @@ import com.github.libsgh.tieba.util.JsonKit;
 import com.github.libsgh.tieba.util.StrKit;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 
 /**
@@ -364,7 +366,7 @@ public class TieBaApi {
 	/**
 	 * 获取tbs
 	 * @param bduss bduss
-	 * @return tbs tbs
+	 * @return tbs
 	 */
 	public String getTbs(String bduss){
 		try {
@@ -987,108 +989,156 @@ public class TieBaApi {
 	/**
 	 * 回帖
 	 * @param bduss bduss
+	 * @param tbs (应该避免频繁获取，因为tbs获取可能会失败){@link TieBaApi#getTbs}
 	 * @param tid 帖子id
-	 * @param tbName 贴吧名称
-	 * @param content 回复内容
-	 * @param clientType 模拟的客户端类型
-	 * @return 操作结果
+	 * @param fid 贴吧的fid
+	 * @param tbName 贴吧名字
+	 * @param content 回帖内容
+	 * @param clientType {@link ClientType}，0为随机
+	 * @return 回帖接口json，error_code为0代表回帖成功
 	 */
-	public String reply(String bduss, String tid, String tbName, String content, Integer clientType){
-		String msg = "";
+	public String reply(String bduss, String tbs, String tid, String fid, String tbName, String content, int clientType){
 		try {
-			List<NameValuePair> list = new ArrayList<NameValuePair>();
-			list.add(new BasicNameValuePair("BDUSS", bduss));
 			if(clientType == 0){//随机选择一种方式
 				ClientType[] arr = ClientType.values();
 				Random random= new Random();
 				int  num = random.nextInt(arr.length);
 				clientType = arr[num].getCode();
 			}
-			list.add(new BasicNameValuePair("_client_id", "wappc_1450693793907_490"));
-			list.add(new BasicNameValuePair("_client_type", clientType.toString()));
-			list.add(new BasicNameValuePair("_client_version", "6.2.2"));
-			list.add(new BasicNameValuePair("_phone_imei", "864587027315606"));
-			list.add(new BasicNameValuePair("anonymous", "0"));
-			list.add(new BasicNameValuePair("content", content));
-			list.add(new BasicNameValuePair("fid", getFid(tbName)));
-			list.add(new BasicNameValuePair("kw", tbName));
-			list.add(new BasicNameValuePair("net_type", "3"));
-			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
-			list.add(new BasicNameValuePair("tid", tid));
-			list.add(new BasicNameValuePair("title", ""));
-			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
-			HttpResponse response = hk.execute(Constants.REPLY_POST_URL, createCookie(bduss), list);
-			String result = EntityUtils.toString(response.getEntity());
-			if(logger.isDebugEnabled()) {
-	        	logger.debug(result);
-	        }
-			String code = (String) JsonKit.getInfo("error_code", result);
-			msg = (String) JsonKit.getInfo("msg", result);
-			if("0".equals(code)){//回帖成功
-				return "回帖成功";
-			} else {
-				return "回帖失败，错误代码："+code+" "+ (String) JsonKit.getInfo("error_msg", result);
-			}
+			HttpRequest request = HttpRequest.post(Constants.REPLY_POST_URL)
+					.header("Content-Type", "application/x-www-form-urlencoded")
+					.header("Cookie", "ka=open")
+					.header("User-Agent", "bdtb for Android 9.7.8.0")
+					.header("Connection", "close")
+					.header("Accept-Encoding", "gzip")
+					.header("Host", "c.tieba.baidu.com")
+					.form("BDUSS", bduss).form("_client_type", clientType)
+					.form("_client_version", "9.7.8.0").form("_phone_imei", "000000000000000")
+					.form("anonymous", "1").form("content", content)
+					.form("fid", TieBaApi.getInstance().getFid("bug")).form("from", "1008621x")
+					.form("is_ad", "0").form("kw", tbName).form("model", "MI+5")
+					.form("net_type", "1").form("new_vcode", "1")
+					.form("tbs", tbs).form("tid", tid)
+					.form("timestamp", System.currentTimeMillis()).form("vcode_tag", "11");
+		Map<String, Object> formMap = request.form();
+		formMap = MapUtil.sort(formMap);
+		StringBuilder sb = new StringBuilder();
+		for (String key : formMap.keySet()) {
+			sb.append(String.format("%s=%s", key, formMap.get(key)).toString());
+		}
+		sb.append("tiebaclient!!!");
+		String sign = SecureUtil.md5(sb.toString()).toUpperCase();
+		String body = request.form("sign", sign).execute().body();
+		return body;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		
-		return StrKit.notBlank(msg)?msg:"回帖失败";
+		return "";
+	}
+	
+	/**
+	 * 回帖（tbs、fid调用接口获取）
+	 * @param bduss bduss
+	 * @param tid 帖子id
+	 * @param tbName 贴吧名字
+	 * @param content 回帖内容
+	 * @param clientType {@link ClientType}，0为随机
+	 * @return 回帖接口json，error_code为0代表回帖成功
+	 */
+	public String reply(String bduss, String tid, String tbName, String content, int clientType){
+		return reply(bduss, this.getTbs(bduss), tid, this.getFid(tbName), tbName, content, clientType);
+	}
+	
+	/**
+	 * 回帖（随机客户端）
+	 * @param bduss bduss
+	 * @param tid 帖子id
+	 * @param tbName 贴吧名字
+	 * @param content 回帖内容
+	 * @return 回帖接口json，error_code为0代表回帖成功
+	 */
+	public String reply(String bduss, String tid, String tbName, String content){
+		return reply(bduss, this.getTbs(bduss), tid, this.getFid(tbName), tbName, content, 0);
 	}
 	
 	/**
 	 * 楼中楼回复
 	 * @param bduss bduss
+	 * @param tbs (应该避免频繁获取，因为tbs获取可能会失败){@link TieBaApi#getTbs}
 	 * @param tid 帖子id
+	 * @param pid 楼层id
+	 * @param fid 贴吧fid
 	 * @param tbName 贴吧名称
-	 * @param content 回帖内容
-	 * @param clientType 模拟客户端类型0，为随机
-	 * @param pid 回复楼层id
-	 * @return 回复结果
+	 * @param content 回帖内容，如果是回复楼中楼（回复+un+:xxx）
+	 * @param clientType {@link ClientType}，0为随机
+	 * @return 回帖接口json，error_code为0代表回帖成功
 	 */
-	public String replyFloor(String bduss, String tid, String tbName, String content, Integer clientType, String pid){
-		String msg = "";
+	public String replyFloor(String bduss, String tbs, String tid, String pid, String fid, String tbName, String content, int clientType){
 		try {
-			List<NameValuePair> list = new ArrayList<NameValuePair>();
-			list.add(new BasicNameValuePair("BDUSS", bduss));
 			if(clientType == 0){//随机选择一种方式
 				ClientType[] arr = ClientType.values();
 				Random random= new Random();
 				int  num = random.nextInt(arr.length);
 				clientType = arr[num].getCode();
 			}
-			list.add(new BasicNameValuePair("_client_id", "wappc_1450693793907_490"));
-			list.add(new BasicNameValuePair("_client_type", clientType.toString()));
-			list.add(new BasicNameValuePair("_client_version", "6.5.2"));
-			list.add(new BasicNameValuePair("_phone_imei", "864587027315606"));
-			list.add(new BasicNameValuePair("anonymous", "1"));
-			list.add(new BasicNameValuePair("content", content));
-			list.add(new BasicNameValuePair("fid", getFid(tbName)));
-			list.add(new BasicNameValuePair("kw", tbName));
-			list.add(new BasicNameValuePair("model", "SCH-I959"));
-			list.add(new BasicNameValuePair("new_vcode", "1"));
-			list.add(new BasicNameValuePair("quote_id", pid));
-			list.add(new BasicNameValuePair("tbs", getTbs(bduss)));
-			list.add(new BasicNameValuePair("tid", tid));
-			list.add(new BasicNameValuePair("vcode_tag", "11"));
-			list.add(new BasicNameValuePair("sign", StrKit.md5Sign(list)));
-			HttpResponse response = hk.execute(Constants.REPLY_POST_URL, createCookie(bduss), list);
-			String result = EntityUtils.toString(response.getEntity());
-			if(logger.isDebugEnabled()) {
-	        	logger.debug(result);
-	        }
-			String code = (String) JsonKit.getInfo("error_code", result);
-			msg = (String) JsonKit.getInfo("msg", result);
-			if("0".equals(code)){//回帖成功
-				return "回帖成功";
-			} else {
-				return "回帖失败，错误代码："+code+" "+ (String) JsonKit.getInfo("error_msg", result);
+			HttpRequest request = HttpRequest.post(Constants.REPLY_POST_URL)
+					.header("Content-Type", "application/x-www-form-urlencoded")
+					.header("Cookie", "ka=open")
+					.header("User-Agent", "bdtb for Android 9.7.8.0")
+					.header("Connection", "close")
+					.header("Accept-Encoding", "gzip")
+					.header("Host", "c.tieba.baidu.com")
+					.form("BDUSS", bduss).form("_client_type", clientType)
+					.form("_client_id", "wappc_1534235498291_488").form("_client_version", "9.7.8.0")
+					.form("_phone_imei", "000000000000000").form("anonymous", "1")
+					.form("content", content).form("fid", fid)
+					.form("kw", tbName).form("model", "MI+5")
+					.form("net_type", "1").form("new_vcode", "1")
+					.form("post_from", "3").form("quote_id", pid)
+					.form("tbs", tbs).form("tid", tid)
+					.form("timestamp", System.currentTimeMillis()).form("vcode_tag", "12");
+			Map<String, Object> formMap = request.form();
+			formMap = MapUtil.sort(formMap);
+			StringBuilder sb = new StringBuilder();
+			for (String key : formMap.keySet()) {
+				sb.append(String.format("%s=%s", key, formMap.get(key)).toString());
 			}
+			sb.append("tiebaclient!!!");
+			String sign = SecureUtil.md5(sb.toString()).toUpperCase();
+			String body = request.form("sign", sign).execute().body();
+			return body;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 		
-		return StrKit.notBlank(msg)?msg:"回帖失败";
+		return "";
+	}
+	
+	/**
+	 * 楼中楼回复（随机客户端）
+	 * @param bduss bduss
+	 * @param tid 帖子id
+	 * @param pid 楼层id
+	 * @param tbName 贴吧名称
+	 * @param content 回帖内容，如果是回复楼中楼（回复+un+:xxx）
+	 * @return 回帖接口json，error_code为0代表回帖成功
+	 */
+	public String replyFloor(String bduss, String tid, String pid, String tbName, String content){
+		return replyFloor(bduss, this.getTbs(bduss), tid, pid, this.getFid(tbName), tbName, content, 0);
+	}
+	
+	/**
+	 * 楼中楼回复（tbs、fid调用接口获取）
+	 * @param bduss bduss
+	 * @param tid 帖子id
+	 * @param pid 楼层id
+	 * @param tbName 贴吧名称
+	 * @param content 回帖内容，如果是回复楼中楼（回复+un+:xxx）
+	 * @param clientType {@link ClientType}，0为随机
+	 * @return 回帖接口json，error_code为0代表回帖成功
+	 */
+	public String replyFloor(String bduss, String tid, String pid, String tbName, String content, int clientType){
+		return replyFloor(bduss, this.getTbs(bduss), tid, pid, this.getFid(tbName), tbName, content, clientType);
 	}
 	
 	/**
@@ -1641,26 +1691,6 @@ public class TieBaApi {
 			this.unfocus(bduss, tbName);
 		}
 		return flag;
-	}
-	
-	/**
-	 * 根据百度盘分享url查询完整用户名（大部分可查）
-	 * @param panUrl 百度云盘分享url
-	 * @return 完整用户名
-	 */
-	public String getFullNameByPanUrl(String panUrl) {
-		try {
-			panUrl = StrUtil.replace(panUrl, "wap", "share");
-			String html = EntityUtils.toString(hk.execute(panUrl).getEntity());
-			String uk = StrKit.substring(html, "uk\":", ",");
-			String json = HttpUtil.get(String.format(Constants.UK_UN, uk));
-			JSONObject jsonObject = JSON.parseObject(json);
-			String un = JSONPath.eval(jsonObject, "$.user_info.uname").toString();
-			return un;
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
-		return null;
 	}
 	
 	/**
