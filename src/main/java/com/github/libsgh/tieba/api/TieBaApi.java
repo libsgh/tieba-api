@@ -134,9 +134,6 @@ public class TieBaApi {
 						}
 					}
 					stoken = hk.doGetStoken(Constants.PASSPORT_AUTH_URL,createCookie(bduss, null, ptoken));
-					logger.debug("bduss:\t"+bduss);
-					logger.debug("ptoken:\t"+ptoken);
-					logger.debug("stoken:\t"+stoken);
 					map.put("stoken", stoken);
 			    break;  
 			    case "18":
@@ -156,9 +153,9 @@ public class TieBaApi {
 						}
 					}
 					stoken = hk.doGetStoken(Constants.PASSPORT_AUTH_URL,createCookie(bduss, null, ptoken));
-					logger.info("bduss:\t"+bduss);
-					logger.info("ptoken:\t"+ptoken);
-					logger.info("stoken:\t"+stoken);
+					logger.debug("bduss:\t"+bduss);
+					logger.debug("ptoken:\t"+ptoken);
+					logger.debug("stoken:\t"+stoken);
 					map.put("stoken", stoken);
 			    	break;  
 			    case "400031":
@@ -641,7 +638,7 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 获取用户隐藏贴吧
+	 * 获取用户隐藏贴吧（接口失效）
 	 * @param username 用户名
 	 * @return result
 	 */
@@ -651,7 +648,7 @@ public class TieBaApi {
 	}
 	
 	/**
-	 * 获取用户隐藏贴吧
+	 * 获取用户隐藏贴吧（接口失效）
 	 * @param uid 用户uid
 	 * @return result
 	 */
@@ -685,7 +682,6 @@ public class TieBaApi {
 		String tStr = "";
 		try {
 			tStr = EntityUtils.toString(hk.execute(Constants.GET_USER_TIEBA, createCookie(bduss), list).getEntity());
-			System.out.println(tStr);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -1329,9 +1325,6 @@ public class TieBaApi {
 				}
 			}
 			stoken = hk.doGetStoken(Constants.PASSPORT_AUTH_URL,createCookie(bduss, null, ptoken));
-			logger.debug("bduss:\t"+bduss);
-			logger.debug("ptoken:\t"+ptoken);
-			logger.debug("stoken:\t"+stoken);
 			map.put("stoken", stoken);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
