@@ -72,6 +72,6 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
 1. **回帖接口可能导致全吧封禁，请谨慎使用**
 2. **登录接口许久未更新，目前只做参考，主流方式是扫码登录获取cookie**
 
-使用推荐：基于api实现的微信公众号：ponbous，[web站点](http://noki.icu/tieba)
+使用推荐：基于api实现的微信公众号：ponbous，[web站点](https://noki.top/tieba)
 
 有问题提issue或q：359916450
