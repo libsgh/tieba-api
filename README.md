@@ -72,6 +72,11 @@ libraryDependencies += "com.github.libsgh" % "tieba-api" % "${lastVersion}"
 1. **回帖接口可能导致全吧封禁，请谨慎使用**
 2. **登录接口许久未更新，目前只做参考，主流方式是扫码登录获取cookie**
 
-使用推荐：基于api实现的微信公众号：ponbous，[web站点](https://noki.top/tieba)
+使用推荐：基于api实现的微信公众号：ponbous，[web站点](https://sign.noki.top)
 
 有问题提issue或q：359916450
+
+## Credits
+
+Thanks for [DartNode](https://dartnode.com) that sponsors this project with its free VPS for open-source developers!
+<h1><p align="center"><img src="https://app.dartnode.com/assets/dash/images/brand/logo.png" alt="DartNode" height="292"></p></h1>
